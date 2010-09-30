@@ -23,7 +23,7 @@ public:
 	bool readData(void* pTargetData,QString Filename,QString Name)
 	{
 	  if(Filename.isEmpty()||Name.isEmpty())
-			return false;
+			return false;                       //FIXME LOGGING!
 
 		QFile xmlData(Filename);
 
@@ -64,10 +64,13 @@ template <class T> class XmlDataLib
 		XmlRead getData;
 
 		if(!getData.readData(&m_data,Filename,objName))
-			printf("shitz happenedz!");				//FIXME loggerklasse einbauen
+			printf("shitz happenedz!\n");				//FIXME loggerklasse einbauen
 	}
 
-	~XmlDataLib();
+	~XmlDataLib()
+	    {
+
+	    }
 
 	T& data()
 	    {

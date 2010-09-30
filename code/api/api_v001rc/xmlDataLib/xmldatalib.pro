@@ -4,7 +4,8 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	./data_defines.h
+HEADERS +=	./data_defines.h\
+		xmldatalib.h
 
 ############################# Source Files ##################################
 
