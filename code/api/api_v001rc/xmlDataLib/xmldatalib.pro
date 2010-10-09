@@ -4,22 +4,30 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	./data_defines.h\
-		xmldatalib.h
+HEADERS +=	include/data_defines.h\
+		    include/xmldatalib.h
 
 ############################# Source Files ##################################
 
-SOURCES += 	./main.cpp	
+SOURCES += 	src/main.cpp
 
 ############################# Resource Files ##################################
-
 
 TARGET = ./release/xmlDataLib
 TARGET += ./release/xmlDataLib
 
 ############################# Dependencies ##################################
 
+INCLUDEPATH += ./include \
+               ./src    \
+
+############################# Dependencies ##################################
+
 DEPENDPATH += ;$$INCLUDEPATH
+
+############################# XML2header ##################################
+
+XML2HEADER=xxml2header
 
 ############################# QT Libraries ##################################
 
