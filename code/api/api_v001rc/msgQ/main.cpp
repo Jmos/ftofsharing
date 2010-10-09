@@ -7,16 +7,20 @@
 //=================================================================
 
 
-
 #include <QStringList>
 #include <QDomDocument>
 #include <QString>
 #include <QFile>
+#include <QList>
+#include <stdio.h>
+#include <conio.h>
+#include <iostream>
 
-
+using namespace std;
 
 int main (int argc, char** argv)
-    {
-	XmlDataLib<int> dat("obj","file");
-    return 0;
-    }
+{
+
+
+ return 0;
+}
