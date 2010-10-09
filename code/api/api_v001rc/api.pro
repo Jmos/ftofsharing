@@ -1,4 +1,5 @@
 TEMPLATE=subdirs
 
 SUBDIRS +=  xml2header \
-            xmlDataLib
+            xmlDataLib \
+            msgQ
