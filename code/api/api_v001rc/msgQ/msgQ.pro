@@ -4,14 +4,19 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=
+HEADERS += ./include/msgQ.h
 
 ############################# Source Files ##################################
 
-SOURCES +=  ./main.cpp
+SOURCES +=  ./main.cpp \
+            ./src/msgQ.cpp
 
-############################# Resource Files ##################################
+############################# IncludePath  ##################################
 
+INCLUDEPATH += ./include \
+               ./src 
+
+############################# Resource Files ################################
 
 TARGET = ./msgQ
 TARGET += ./msgQ
