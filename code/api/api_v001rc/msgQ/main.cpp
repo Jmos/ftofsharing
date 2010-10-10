@@ -26,13 +26,13 @@ int main (int argc, char** argv)
 {
  int msgQID;
 
- msgQID= MessageQue.AddMessageQue();
+ msgQID= MessageQ.AddMessageQ();
 
- cout << "MessageQueID: " << msgQID << endl;
+ cout << "MessageQID: " << msgQID << endl;
  getch();
 
- MessageQue.SendMessage(msgQID, 5, 6, "Hallo, das ist ein Test!");
- MessageQue.SendMessage(msgQID, 5, 6, "Hallo, das ist noch ein Test!");
+ MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist ein Test!");
+ MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist noch ein Test!");
 
  cout << "Send OK" << endl;
  getch();
@@ -40,15 +40,15 @@ int main (int argc, char** argv)
  int RxID;
  QString Message;
 
- MessageQue.ReceiveMessage(msgQID, 6, RxID, Message);
+ MessageQ.ReceiveMessage(msgQID, 6, RxID, Message);
  std::cout << RxID << " sagt: " << qPrintable(Message) << endl;
 
- MessageQue.ReceiveMessage(msgQID, 6, RxID, Message);
+ MessageQ.ReceiveMessage(msgQID, 6, RxID, Message);
  std::cout << RxID << " sagt: " << qPrintable(Message) << endl;
 
  getch();
 
- MessageQue.DeleteMessageQue(msgQID);
+ MessageQ.DeleteMessageQ(msgQID);
  cout << "Deleted.";
 
  getch();

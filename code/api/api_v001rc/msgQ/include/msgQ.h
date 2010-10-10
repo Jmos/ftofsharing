@@ -11,61 +11,54 @@
 #define _MSGQ_H_
 //-----------------------------------------------------------------
 
-#define MaxMessageQueCount 		100000
+#define MaxMessageQCount 		10000   ///< Legt die maximale Anzahl von MessageQs fest.
 //-----------------------------------------------------------------
 
-#include <iostream>
 #include <QMutex>
-#include <stdio.h>
-#include <conio.h>
-#include <iostream>
-
 
 #include "msgList.h"
 //-----------------------------------------------------------------
-/*******************************************************************************
+/**
 *    @ingroup   api
 *
-*    @brief     Verwaltungsklasse für MessageQues
+*    Mit dieser Klasse können auf einfache Weise MessageQs erstellt,
+*    verwendet und gelöscht werden.
+*
+*    @brief     Verwaltungsklasse für MessageQs
 *    @author    Saxl Georg
 *    @version   1.0
 *    @date  	\a Begonnnen: 09.10.2010  \n\n
 *       	    \a Abgeschlossen:
-*    @since
-*
-*
-*   Mit dieser Klasse können auf einfache Weise MessageQueserstellt,
-*   verwendet und gelöscht werden.
 *
 *******************************************************************************/
 
-class TMessageQue
+class TMessageQ
 {
-  QList<TMessageList *> cMessageQues;
+  QList<TMessageList *> cMessageQs;
   QMutex cMutex;
 
-  int FreeMessageQueID();
-  int MessageQueID2Index(int iMessageQueID);
+  int FreeMessageQID();
+  int MessageQID2Index(int iMessageQID);
 
  public:
 
-  TMessageQue()
+  TMessageQ()
   {
   }
 
-  ~TMessageQue()
+  ~TMessageQ()
   {
   }
 
-  int AddMessageQue();
-  bool DeleteMessageQue(int iMessageQueID);
-  bool SendMessage(int iMessageQueID, int iMyID, int iRemoteID, QString iMessage);
-  bool ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage);
-  bool ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp);
+  int AddMessageQ();
+  bool DeleteMessageQ(int iMessageQID);
+  bool SendMessage(int iMessageQID, int iMyID, int iRemoteID, QString iMessage);
+  bool ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage);
+  bool ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp);
 };
 //-----------------------------------------------------------------
 
-extern TMessageQue MessageQue;
+extern TMessageQ MessageQ;
 //-----------------------------------------------------------------
 
 //-----------------------------------------------------------------

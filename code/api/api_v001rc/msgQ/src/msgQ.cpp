@@ -4,51 +4,51 @@
 //-----------------------------------------------------------------
 
 /**
-*  Erstellt eine neue MessageQue.
+*  Erstellt eine neue MessageQ.
 *
-*  @return	Liefert bei Erfolg eine einzigartige MessageQueID, ansonsten -1.
+*  @return	Liefert bei Erfolg eine einzigartige MessageQID, ansonsten -1.
 *
 ********************************************************************************/
-int TMessageQue::AddMessageQue()
+int TMessageQ::AddMessageQ()
 {
  cMutex.lock();
 
 
- int MessageQueID= FreeMessageQueID();
+ int MessageQID= FreeMessageQID();
 
- if (MessageQueID == -1)
+ if (MessageQID == -1)
     {
      cMutex.unlock();
      return -1;
     }
 
- TMessageList *MessageList = new TMessageList(MessageQueID);
- cMessageQues.append(MessageList);
+ TMessageList *MessageList = new TMessageList(MessageQID);
+ cMessageQs.append(MessageList);
 
 
  cMutex.unlock();
 
- return MessageQueID;
+ return MessageQID;
 }
 
 /**
-*  Löscht eine MessageQue
+*  Löscht eine MessageQ
 *
-*  @param	iMessageQueID Gibt an welche MessageQue gelöscht werden soll.
+*  @param	iMessageQID Gibt an welche MessageQ gelöscht werden soll.
 *  @return	Bei Erfolg true, ansonsten false.
 *
 ********************************************************************************/
-bool TMessageQue::DeleteMessageQue(int iMessageQueID)
+bool TMessageQ::DeleteMessageQ(int iMessageQID)
 {
  cMutex.lock();
 
 
- for (int Index= 0; Index < MaxMessageQueCount; Index++)
+ for (int Index= 0; Index < MaxMessageQCount; Index++)
      {
-      if (cMessageQues.at(Index)->GetMessageQueID() == iMessageQueID)
+      if (cMessageQs.at(Index)->GetMessageQID() == iMessageQID)
          {
-          delete cMessageQues.at(Index);
-          cMessageQues.removeAt(Index);
+          delete cMessageQs.at(Index);
+          cMessageQs.removeAt(Index);
           cMutex.unlock();
           return true;
          }
@@ -61,24 +61,24 @@ bool TMessageQue::DeleteMessageQue(int iMessageQueID)
 }
 
 /**
-*  Sendet eine Nachricht an eine MessageQue
+*  Sendet eine Nachricht an eine MessageQ
 *
-*  @param   iMessageQueID Gibt an welche MessageQue verwendet wird.
-*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein)
-*  @param   iRemoteID Gibt die ID des Empfängers an. (Muss in einer MessageQue einzigartig sein)
+*  @param   iMessageQID Gibt an welche MessageQ verwendet wird.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQ einzigartig sein)
+*  @param   iRemoteID Gibt die ID des Empfängers an. (Muss in einer MessageQ einzigartig sein)
 *  @param   iMessage Gibt den Inhalt der Message an.
 *  @return	Bei Erfolg true, ansonsten false.
 *
 ********************************************************************************/
-bool TMessageQue::SendMessage(int iMessageQueID, int iMyID, int iRemoteID, QString iMessage)
+bool TMessageQ::SendMessage(int iMessageQID, int iMyID, int iRemoteID, QString iMessage)
 {
  cMutex.lock();
 
- int Index= MessageQueID2Index(iMessageQueID);
+ int Index= MessageQID2Index(iMessageQID);
 
  if (Index != -1)
 	{
-     cMessageQues.at(Index)->SendMessage(iMyID, iRemoteID, iMessage);
+     cMessageQs.at(Index)->SendMessage(iMyID, iRemoteID, iMessage);
 	}
     else
        {
@@ -92,25 +92,25 @@ bool TMessageQue::SendMessage(int iMessageQueID, int iMyID, int iRemoteID, QStri
 }
 
 /**
-*  Empfängt eine Nachricht aus einer MessageQue
+*  Empfängt eine Nachricht aus einer MessageQ
 *
-*  @param	iMessageQueID Gibt die zu verwendente MessageQue an.
-*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein).
+*  @param	iMessageQID Gibt die zu verwendente MessageQ an.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQ einzigartig sein).
 *  @param   oRemoteID Liefert die ID des Absenders an.
 *  @param   oMessage Liefert die empfangene Nachricht.
 *  @param   oTimestamp Liefert den Zeitpunkt an dem die Nachricht gesendet wurde.
 *  @return	Liefert ture wenn eine Nachricht empfangen wurde, ansonsten false.
 *
 ********************************************************************************/
-bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp)
+bool TMessageQ::ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp)
 {
  cMutex.lock();
 
- int Index= MessageQueID2Index(iMessageQueID);
+ int Index= MessageQID2Index(iMessageQID);
 
  if (Index != -1)
     {
-     cMessageQues.at(Index)->ReceiveMessage(iMyID, oMessage, oRemoteID, oTimestamp);
+     cMessageQs.at(Index)->ReceiveMessage(iMyID, oMessage, oRemoteID, oTimestamp);
     }
     else
        {
@@ -124,34 +124,34 @@ bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, Q
 }
 
 /**
-*  Empfängt eine Nachricht aus einer MessageQue
+*  Empfängt eine Nachricht aus einer MessageQ
 *
-*  @param   iMessageQueID Gibt die zu verwendente MessageQue an.
-*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein).
+*  @param   iMessageQID Gibt die zu verwendente MessageQ an.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQ einzigartig sein).
 *  @param   oRemoteID Liefert die ID des Absenders an.
 *  @param   oMessage Liefert die empfangene Nachricht.
 *  @return  Liefert ture wenn eine Nachricht empfangen wurde, ansonsten false.
 *
 ********************************************************************************/
-bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage)
+bool TMessageQ::ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage)
 {
  QTime Timestamp;
 
- return ReceiveMessage(iMessageQueID, iMyID, oRemoteID, oMessage, Timestamp);
+ return ReceiveMessage(iMessageQID, iMyID, oRemoteID, oMessage, Timestamp);
 }
 //-----------------------------------------------------------------
 
-int TMessageQue::FreeMessageQueID()
+int TMessageQ::FreeMessageQID()
 {
  bool freeID;
 
- for (int MessageQueID= 0; MessageQueID <= MaxMessageQueCount; MessageQueID++)
+ for (int MessageQID= 0; MessageQID <= MaxMessageQCount; MessageQID++)
      {
       freeID= true;
 
-      for (int Index= 0; Index < cMessageQues.size(); Index++)
+      for (int Index= 0; Index < cMessageQs.size(); Index++)
           {
-           if (cMessageQues.at(Index)->GetMessageQueID() == MessageQueID)
+           if (cMessageQs.at(Index)->GetMessageQID() == MessageQID)
               {
                freeID= false;
                break;
@@ -159,18 +159,18 @@ int TMessageQue::FreeMessageQueID()
           }
 
       if (freeID)
-         return MessageQueID;
+         return MessageQID;
      }
 
  return -1;
 }
 //-----------------------------------------------------------------
 
-int TMessageQue::MessageQueID2Index(int iMessageQueID)
+int TMessageQ::MessageQID2Index(int iMessageQID)
 {
- for (int Index= 0; Index < cMessageQues.size(); Index++)
+ for (int Index= 0; Index < cMessageQs.size(); Index++)
      {
-      if (cMessageQues.at(Index)->GetMessageQueID() == iMessageQueID)
+      if (cMessageQs.at(Index)->GetMessageQID() == iMessageQID)
          return Index;
      }
 
@@ -179,6 +179,6 @@ int TMessageQue::MessageQueID2Index(int iMessageQueID)
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
 
-TMessageQue MessageQue;
+TMessageQ MessageQ;
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------

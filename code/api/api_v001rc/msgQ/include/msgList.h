@@ -10,13 +10,9 @@
 #define _MSGLIST_H_
 //-----------------------------------------------------------------
 
-#include <QMutex>
 #include <QString>
 #include <QList>
 #include <QTime>
-#include <stdio.h>
-#include <conio.h>
-#include <iostream>
 //-----------------------------------------------------------------
 
 struct RMessage
@@ -31,13 +27,13 @@ struct RMessage
 class TMessageList
 {
   QList<RMessage> cMessageList;
-  int cMessageQueID;
+  int cMessageQID;
 
  public:
 
-  TMessageList(int iMessageQueID)
+  TMessageList(int iMessageQID)
   {
-   cMessageQueID= iMessageQueID;
+   cMessageQID= iMessageQID;
   }
 
   ~TMessageList()
@@ -48,7 +44,7 @@ class TMessageList
   void SendMessage(int TxID, QList<int> RxID, QString MessageString);
   bool ReceiveMessage(int PeerID, QString &Message, int &RxID, QTime &Timestamp);
   void ClearMessageList();
-  int GetMessageQueID();
+  int GetMessageQID();
 };
 
 //-----------------------------------------------------------------

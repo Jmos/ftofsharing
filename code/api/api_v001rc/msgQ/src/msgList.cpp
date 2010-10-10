@@ -59,9 +59,9 @@ void TMessageList::ClearMessageList()
 }
 //-----------------------------------------------------------------
 
-int TMessageList::GetMessageQueID()
+int TMessageList::GetMessageQID()
 {
- return cMessageQueID;
+ return cMessageQID;
 }
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
