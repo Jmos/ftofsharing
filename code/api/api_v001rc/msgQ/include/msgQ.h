@@ -23,6 +23,21 @@
 
 #include "msgList.h"
 //-----------------------------------------------------------------
+/*******************************************************************************
+*    @ingroup   api
+*
+*    @brief     Verwaltungsklasse für MessageQues
+*    @author    Saxl Georg
+*    @version   1.0
+*    @date  	\a Begonnnen: 09.10.2010  \n\n
+*       	    \a Abgeschlossen:
+*    @since
+*
+*
+*   Mit dieser Klasse können auf einfache Weise MessageQueserstellt,
+*   verwendet und gelöscht werden.
+*
+*******************************************************************************/
 
 class TMessageQue
 {

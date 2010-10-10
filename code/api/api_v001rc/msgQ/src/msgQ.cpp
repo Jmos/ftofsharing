@@ -3,7 +3,12 @@
 #include "msgQ.h"
 //-----------------------------------------------------------------
 
-
+/**
+*  Erstellt eine neue MessageQue.
+*
+*  @return	Liefert bei Erfolg eine einzigartige MessageQueID, ansonsten -1.
+*
+********************************************************************************/
 int TMessageQue::AddMessageQue()
 {
  cMutex.lock();
@@ -25,8 +30,14 @@ int TMessageQue::AddMessageQue()
 
  return MessageQueID;
 }
-//-----------------------------------------------------------------
 
+/**
+*  Löscht eine MessageQue
+*
+*  @param	iMessageQueID Gibt an welche MessageQue gelöscht werden soll.
+*  @return	Bei Erfolg true, ansonsten false.
+*
+********************************************************************************/
 bool TMessageQue::DeleteMessageQue(int iMessageQueID)
 {
  cMutex.lock();
@@ -48,8 +59,17 @@ bool TMessageQue::DeleteMessageQue(int iMessageQueID)
 
  return false;
 }
-//-----------------------------------------------------------------
 
+/**
+*  Sendet eine Nachricht an eine MessageQue
+*
+*  @param   iMessageQueID Gibt an welche MessageQue verwendet wird.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein)
+*  @param   iRemoteID Gibt die ID des Empfängers an. (Muss in einer MessageQue einzigartig sein)
+*  @param   iMessage Gibt den Inhalt der Message an.
+*  @return	Bei Erfolg true, ansonsten false.
+*
+********************************************************************************/
 bool TMessageQue::SendMessage(int iMessageQueID, int iMyID, int iRemoteID, QString iMessage)
 {
  cMutex.lock();
@@ -70,8 +90,18 @@ bool TMessageQue::SendMessage(int iMessageQueID, int iMyID, int iRemoteID, QStri
 
  return true;
 }
-//-----------------------------------------------------------------
 
+/**
+*  Empfängt eine Nachricht aus einer MessageQue
+*
+*  @param	iMessageQueID Gibt die zu verwendente MessageQue an.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein).
+*  @param   oRemoteID Liefert die ID des Absenders an.
+*  @param   oMessage Liefert die empfangene Nachricht.
+*  @param   oTimestamp Liefert den Zeitpunkt an dem die Nachricht gesendet wurde.
+*  @return	Liefert ture wenn eine Nachricht empfangen wurde, ansonsten false.
+*
+********************************************************************************/
 bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp)
 {
  cMutex.lock();
@@ -92,8 +122,17 @@ bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, Q
 
  return true;
 }
-//-----------------------------------------------------------------
 
+/**
+*  Empfängt eine Nachricht aus einer MessageQue
+*
+*  @param   iMessageQueID Gibt die zu verwendente MessageQue an.
+*  @param   iMyID Gibt die eigene ID an. (Muss in einer MessageQue einzigartig sein).
+*  @param   oRemoteID Liefert die ID des Absenders an.
+*  @param   oMessage Liefert die empfangene Nachricht.
+*  @return  Liefert ture wenn eine Nachricht empfangen wurde, ansonsten false.
+*
+********************************************************************************/
 bool TMessageQue::ReceiveMessage(int iMessageQueID, int iMyID, int &oRemoteID, QString &oMessage)
 {
  QTime Timestamp;
