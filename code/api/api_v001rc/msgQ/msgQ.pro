@@ -4,12 +4,14 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS += ./include/msgQ.h
+HEADERS += ./include/msgQ.h \
+           ./include/msgList.h
 
 ############################# Source Files ##################################
 
 SOURCES +=  ./main.cpp \
-            ./src/msgQ.cpp
+            ./src/msgQ.cpp \
+            ./src/msgList.cpp
 
 ############################# IncludePath  ##################################
 
