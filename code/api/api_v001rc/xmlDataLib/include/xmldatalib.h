@@ -57,7 +57,7 @@ public:
 	    if(!n.hasChildNodes())
 		{
 		printf("***************ERROR*************************************************************\n");
-		printf("***************Node:<%s> has no Child nodes**************************************\n");
+		printf("***************Node has no Child nodes*************************************\n");
 		}
 	    QDomNodeList subNodes = n.childNodes();
 	    for(int x = 0; x< subNodes.size();x++)
@@ -92,7 +92,7 @@ public:
 	{
 	if (Filename.isEmpty() || Name.isEmpty())
 	    return false; //FIXME LOGGING!
-
+	printf("bla");
 	QString fileAndPath;
 	fileAndPath.append(Filename);
 	QFile xmlData(fileAndPath);
@@ -123,7 +123,7 @@ public:
 	    if(!n.hasChildNodes())
 		{
 		printf("***************ERROR*************************************************************\n");
-		printf("***************Node:<%s> has no Child nodes**************************************\n");
+		printf("***************Node has no Child nodes**************************************\n");
 		}
 	    QDomNodeList subNodes = n.childNodes();
 
@@ -137,9 +137,11 @@ public:
 	    QDomElement e = subNodes.item(0).toElement();
 	    if(e.hasAttribute("value"))
 		{
-		memcpy(readData, pGottenData, sizeof(pGottenData));
-
-		QString value((char*)pGottenData,sizeof(pGottenData));
+		char* c;
+		memcpy(c,pGottenData,sizeof(pGottenData));
+		QString value(c);
+		printf("***************written data....*************************************************************\n");
+		printf("***************<%s>***********************************************\n",qPrintable(value));
 		e.setAttribute("value",value);
 		}
 	return true;
@@ -173,7 +175,8 @@ public:
     XmlDataLib<T>& operator=(const XmlDataLib<T>& other)
       {
           m_data = other.m_data;
-          writeToDb();
+          printf("working?");
+          writeToXML();
           return *this;
       };
 
@@ -184,10 +187,10 @@ private:
 	memset(&m_data, 0, sizeof(T));
 	}
 
-    void writeToDb()
+    void writeToXML()
 	{
 	XmlRead writeData;
-
+	printf("blub");
 	if(!writeData.writeData(&m_data,"objects.xml",readObjName))
 	    printf("shitz happenedz!\n"); //FIXME Loggerklasse einbauen
 	}

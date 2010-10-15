@@ -21,16 +21,18 @@
 #include <QFile>
 
 
-typedef struct __FLIP_SETTINGS__
-    {
-    int dFlipUpAngle;
-    int dFlipDownAngle;
-    }__attribute__((__packed__)) FlipSettings;
+//typedef struct __FLIP_SETTINGS__
+//    {
+//    int dFlipUpAngle;
+//    int dFlipDownAngle;
+//    }__attribute__((__packed__)) FlipSettings;
 
 int main (int argc, char** argv)
     {
-    XmlDataLib<FlipSettings> dat(DATA_OBJECTTYPE);
-    printf("%d \n",dat.data().dFlipDownAngle);
+    XmlDataLib<int> dat(DATA_OBJECTTYPE);
+    printf("%d \n",dat.data());
+    printf("%d \n",dat.data());
+    getchar();
     return 0;
     }
 /****************************************************************************/
