@@ -2,4 +2,7 @@ TEMPLATE=subdirs
 
 SUBDIRS +=  xml2header \
             xmlDataLib \
-            msgQ
+            msgQ \
+            logger \
+            Threading  \
+            udpSocket
