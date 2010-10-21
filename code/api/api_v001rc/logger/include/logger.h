@@ -11,6 +11,7 @@
 // Qt Includes
 #include <QString>
 #include <QThread>
+#include <QFile>
 // Std Includes
 
 // Linux Includes
@@ -49,7 +50,9 @@ class LogLoop : public QThread
 	void mainloop();
 
 	QString internFilename;
+	QString logText;
 	bool fileLogger;
+	bool consoleLogger;
     };
 
 
