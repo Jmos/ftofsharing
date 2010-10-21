@@ -4,18 +4,17 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	include/loggerlib.h\
-		    include/logger.h
+HEADERS +=	include/thread.h
 
 ############################# Source Files ##################################
 
-SOURCES += 	src/logger.cpp \
+SOURCES += 	src/thread.cpp \
             src/main.cpp
 
 ############################# Resource Files ##################################
 
-TARGET = ./release/logger
-TARGET += ./release/logger
+TARGET = ./release/thread
+TARGET += ./release/thread
 
 ############################# Dependencies ##################################
 

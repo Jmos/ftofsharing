@@ -19,15 +19,21 @@
 // Library Includes
 
 // Application Includes
-#include "logger.h"
+#include "thread.h"
 #include "stdio.h"
 // Defines
 
 /**************************************************************************************/
 int main (int argc, char** argv)
     {
-    LogLoop x;
-    x.start();
+    ThrSupport *x = new ThrSupport(1);
+    ThrSupport *y = new ThrSupport(2);
+    ThrSupport *z = new ThrSupport(3);
+
+    x->start(QThread::NormalPriority);
+    y->start(QThread::NormalPriority);
+    z->start(QThread::NormalPriority);
+    getchar();
     return 0;
     }
 

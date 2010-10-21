@@ -11,10 +11,12 @@
 
 // Qt Includes
 #include <QString>
+#include <QTextStream>
 // Std Includes
 
 // Linux Includes
 #include <iostream>
+#include <stdio.h>
 // Windows Includes
 
 // Library Includes
@@ -73,6 +75,7 @@ void LogLoop::setFileLoggerOn(QString Filename)
 void LogLoop::run()
     {
     mainloop();
+    exec();
     }
 
 void LogLoop::mainloop()
@@ -92,7 +95,7 @@ void LogLoop::mainloop()
 	    }
 	if(consoleLogger)
 	    {
-	    cout<<"\n"<<qPrintable(logText);
+	    std::cout<<"\n"<<qPrintable(logText);
 	    }
 	}
     }
