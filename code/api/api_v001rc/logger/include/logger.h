@@ -9,7 +9,8 @@
  **************************************************************************************/
 
 // Qt Includes
-
+#include <QString>
+#include <QThread>
 // Std Includes
 
 // Linux Includes
@@ -17,20 +18,55 @@
 // Windows Includes
 
 // Library Includes
-
+#include "msgQ.h"
 // Application Includes
 
 // Defines
 
 /**************************************************************************************/
 
-class logger
+class Logger
     {
 
     public:
-	logger();
-	~logger();
+    Logger();
+
+    ~Logger();
+
+    void log_base(QString text);
     private:
-}
+    };
+
+class LogLoop : public QThread
+    {
+
+    public:
+	LogLoop();
+	~LogLoop();
+	void setFileLoggerOn(QString Filename);
+	void run();
+    private:
+	void mainloop();
+
+	QString internFilename;
+	bool fileLogger;
+    };
+
+
+//FIXME not used!
+class LogCluster
+    {
+    public:
+    LogCluster();
+    ~LogCluster();
+
+    //single instance global!
+    static LogCluster *get();
+    int getLoglevel();
+
+    private:
+
+    int m_Loglevel;
+    };
 
 #endif //__LOGGER_H__

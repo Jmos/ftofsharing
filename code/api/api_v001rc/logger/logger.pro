@@ -4,12 +4,12 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	include/\
-		    include/
+HEADERS +=	include/loggerlib.h\
+		    include/logger.h
 
 ############################# Source Files ##################################
 
-SOURCES += 	src/main.cpp
+SOURCES += 	src/logger.cpp
 
 ############################# Resource Files ##################################
 
@@ -20,6 +20,7 @@ TARGET += ./release/logger
 
 INCLUDEPATH += ./include \
                ./src    \
+               ../msgQ/include
 
 ############################# Dependencies ##################################
 
