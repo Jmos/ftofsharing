@@ -1,6 +1,6 @@
 /**
  *
- * @file main.cpp
+ * @file example.cpp
  * @author muma
  * @date 24.10.2010
  *
@@ -21,21 +21,18 @@
 
 // Application Includes
 #include "example.h"
-#include <QObject>
 #include "stdio.h"
 // Defines
 
 /**************************************************************************************/
 
-int main (int argc, char** argv)
+void Counter::setValue(int value)
     {
-    Counter a, b;
-    QObject::connect(&a, SIGNAL(valueChanged(int)),&b, SLOT(setValue(int)));
-
-    a.setValue(12);     // a.value() == 12, b.value() == 12
-    printf("<%d>",b.m_value);
-    getchar();
-    b.setValue(48);     // a.value() == 12, b.value() == 48
-    printf("<%d>",a.m_value);
-    getchar();
+    LOG_DECLARE;
+    if (value != m_value)
+	{
+	m_value = value;
+	emit valueChanged(value);
+	}
     }
+
