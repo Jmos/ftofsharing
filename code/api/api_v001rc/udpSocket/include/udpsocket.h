@@ -31,26 +31,19 @@
 *
 *******************************************************************************/
 
-class TUdpSocket : private QUdpSocket//, public QObject
+class CUdpSocket : private QUdpSocket
 {
- Q_OBJECT
-
- public slots:
-
-  void OnReadRead();
-
- signals:
-
-   void OnSocketRead(QString Data, QHostAddress SenderAddress, int SenderPort);
 
  public:
 
-  TUdpSocket();
+  QString ReceiveText();
 
-  void SetLocalPort(int iPort);
-  int  GetLocalPort();
+  void SetSenderPort(int iPort);
+  int  GetSenderPort();
   bool ListenOnPort(int iPort);
   bool SendText(QString iData, QHostAddress iReceiverAddress, int iReceiverPort);
+  bool WaitForReceiveText();
+  bool WaitForReceiveText(int iMilliSeconds);
 
 };
 //-----------------------------------------------------------------

@@ -9,42 +9,37 @@
 #include "udpsocket.h"
 //-----------------------------------------------------------------
 
-TUdpSocket::TUdpSocket()
-{
- connect(this, SIGNAL(readyRead()), this, SLOT(OnReadRead()));
-}
-//-----------------------------------------------------------------
-
-void TUdpSocket::SetLocalPort(int iPort)
+void CUdpSocket::SetSenderPort(int iPort)
 {
  setLocalPort((quint16)iPort);
 }
 //-----------------------------------------------------------------
 
-int TUdpSocket::GetLocalPort()
+int CUdpSocket::GetSenderPort()
 {
  return (int)localPort();
 }
 //-----------------------------------------------------------------
 
-bool TUdpSocket::ListenOnPort(int iPort)
+bool CUdpSocket::ListenOnPort(int iPort)
 {
- return bind((quint16)iPort, QUdpSocket::DontShareAddress);
+ return bind(iPort, QUdpSocket::DontShareAddress);
 }
 //-----------------------------------------------------------------
 
-bool TUdpSocket::SendText(QString iData, QHostAddress iReceiverAddress, int iReceiverPort)
+bool CUdpSocket::SendText(QString iData, QHostAddress iReceiverAddress, int iReceiverPort)
 {
  if (writeDatagram(qPrintable(iData), iData.length(), iReceiverAddress, iReceiverPort) != -1)
     return true;
 
  return false;
 }
-//-----------------------------------------------------------------
+//----------------------------------------------------------------
 
-void TUdpSocket::OnReadRead()
+QString CUdpSocket::ReceiveText()
 {
- QApplication::beep ();
+ if (!hasPendingDatagrams())
+    return "";
 
  QByteArray RxBuffer(pendingDatagramSize(), 0);
  QHostAddress HostAddress;
@@ -54,9 +49,18 @@ void TUdpSocket::OnReadRead()
 
  QString RxData(RxBuffer);
 
- std::cout << qPrintable(RxData);
-
- emit OnSocketRead(RxData, HostAddress, (int)Port);
+ return RxData;
 }
 //-----------------------------------------------------------------
+
+bool CUdpSocket::WaitForReceiveText()
+{
+ return waitForReadyRead();
+}
+//-----------------------------------------------------------------
+
+bool CUdpSocket::WaitForReceiveText(int iMilliSeconds)
+{
+ return waitForReadyRead(iMilliSeconds);
+}
 //-----------------------------------------------------------------

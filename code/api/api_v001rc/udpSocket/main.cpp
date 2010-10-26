@@ -16,22 +16,28 @@
 #include <stdio.h>
 #include <iostream>
 #include <QObject>
-#ifdef WIN32
-#include <conio.h>
-#endif
 
 #include "udpsocket.h"
+
 
 using namespace std;
 
 
 int main (int argc, char** argv)
 {
- TUdpSocket UdpSocket;
+ CUdpSocket UdpSocket;
 
- if (UdpSocket.ListenOnPort(30555))
-    cout << "UDP Socket!" << endl;
+ if (!UdpSocket.ListenOnPort(30555))
+ {
+    cout << "fail";
+    getchar();
+    return 0;
+ }
 
+ UdpSocket.SendText("Hallo Remote", QHostAddress::LocalHost, 30666);
+
+ UdpSocket.WaitForReceiveText();
+ cout << qPrintable(UdpSocket.ReceiveText()) << endl;
 
  getchar();
 
