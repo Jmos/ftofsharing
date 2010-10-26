@@ -1,207 +1,102 @@
-#ifndef __XMLDATALIB_H__
-#define __XMLDATALIB_H__
+#ifndef __XMLDATALIB_H
+#define __XMLDATALIB_H
 
-/*************************************************************************
+/*************************************************+
  *
- * Ricmar Tech - 2010
+ * File xmldatalib2.h created 26.10.2010 from marco
  *
- * File < xmldatalib.h > created <15.09.2010 > by muma
- *
- **************************************************************************/
-
+ */
 //QT Includes
-#include <QStringList>
-#include <QDomDocument>
 #include <QString>
-#include <QFile>
+//API Includes
 
-//Library Includes
 
-class XmlRead
+/**
+ * @brief CXmlHandler is the private "under the hood" access class to our XML Files
+ * This class should not for standalone usage. Please use CXmlDataLib to access the Data
+ *@author marco
+ *@date 26.10.2010
+ */
+class CXmlHandler
     {
 public:
-    bool readData(void* pTargetData, QString Filename, QString Name)
-	{
-	if (Filename.isEmpty() || Name.isEmpty())
-	    return false; //FIXME LOGGING!
+    /**
+     * no special Constructor behaviour
+     */
+    CXmlHandler();
+    /**
+     * no special Destructor behaviour
+     */
+    ~CXmlHandler();
 
-	QString fileAndPath;
-	fileAndPath.append(Filename);
-	QFile xmlData(fileAndPath);
+    /**
+     *The method readData accesses the XML Data, and returns it to you
+     *@param objName - objName stands here for the to accessing object
+     *@param output - The Value, which is now actual in this object
+     *@return true if it worked, false if not. If false see log
+     */
+    bool readData(QString objName, QString &output);
+    /**
+     *The method writeData accesses an object with objName and writes input in the object
+     *@param objName - objName stands here for the to accessing object
+     *@param input - The Value you want to write in the object
+     *@return true if it worked, false if not. If false see log
+     */
+    bool writeData(QString objName, QString input);
 
-	QDomDocument objectDoc("objectType");
-	QString errMsg;
-	QByteArray readData;
-
-	if (!objectDoc.setContent(&xmlData, &errMsg))
-	    {
-	    xmlData.close();
-	    printf("***************ERROR****************************************************\n");
-	    printf("***************Path to file: <%s>***************************************\n",qPrintable(fileAndPath));
-	    printf("***************couldn't set content for DOM!. Errmsg: <%s>**************",qPrintable(errMsg));
-	    return false;
-	    }
-
-	if(!objectDoc.hasChildNodes())
-	    {
-	    printf("***************ERROR****************************************************\n");
-	    printf("***************objectdoc has no Child nodes*****************************\n");
-	    return false;
-	    }
-
-	QDomNodeList nodes = objectDoc.elementsByTagName(Name);
-
-	for (int i = 0; i < nodes.size(); i++)
-	    {
-	    QDomNode n = nodes.item(i);
-	    if(!n.hasChildNodes())
-		{
-		printf("***************ERROR*************************************************************\n");
-		printf("***************Node has no Child nodes*************************************\n");
-		}
-	    QDomNodeList subNodes = n.childNodes();
-	    for(int x = 0; x< subNodes.size();x++)
-		{
-		if(!subNodes.item(x).isElement())
-		    {
-		    printf("***************ERROR*************************************************************\n");
-		    printf("***************Node is no element!***********************************************\n");
-		    return false;
-		    }
-		QDomElement e = subNodes.item(x).toElement();
-		if(e.hasAttribute("value"))
-		    {
-		    printf("<%s>\n",qPrintable(e.attribute("value","30")));
-		    readData.append(e.attribute("value","30").toInt());
-		    }
-		else
-		    {
-		    printf("***************ERROR*************************************************************\n");
-		    printf("***************Node found as number <%d> has no elementattribute called value****\n",i);
-		    printf("***************Elementname: <%s>, Attributename: <%s>****************************\n",qPrintable(e.tagName()),qPrintable(e.text()));
-		    return false;
-		    }
-		}
-	    }
-
-	memcpy(pTargetData, readData.constData(), sizeof(pTargetData));
-	return true;
-	}
-
-    bool writeData(void *pGottenData, QString Filename, QString Name)
-	{
-	if (Filename.isEmpty() || Name.isEmpty())
-	    return false; //FIXME LOGGING!
-	printf("bla");
-	QString fileAndPath;
-	fileAndPath.append(Filename);
-	QFile xmlData(fileAndPath);
-
-	QDomDocument objectDoc("objectType");
-	QString errMsg;
-	QByteArray readData;
-
-	if (!objectDoc.setContent(&xmlData, &errMsg))
-	    {
-	    xmlData.close();
-	    printf("***************ERROR****************************************************\n");
-	    printf("***************Path to file: <%s>***************************************\n",qPrintable(fileAndPath));
-	    printf("***************couldn't set content for DOM!. Errmsg: <%s>**************",qPrintable(errMsg));
-	    return false;
-	    }
-
-	if(!objectDoc.hasChildNodes())
-	    {
-	    printf("***************ERROR****************************************************\n");
-	    printf("***************objectdoc has no Child nodes*****************************\n");
-	    return false;
-	    }
-
-	QDomNodeList nodes = objectDoc.elementsByTagName(Name);
-
-	    QDomNode n = nodes.item(0);
-	    if(!n.hasChildNodes())
-		{
-		printf("***************ERROR*************************************************************\n");
-		printf("***************Node has no Child nodes**************************************\n");
-		}
-	    QDomNodeList subNodes = n.childNodes();
-
-	    if(!subNodes.item(0).isElement())
-		{
-		printf("***************ERROR*************************************************************\n");
-		printf("***************Node is no element!***********************************************\n");
-		return false;
-		}
-
-	    QDomElement e = subNodes.item(0).toElement();
-	    if(e.hasAttribute("value"))
-		{
-		char* c;
-		memcpy(c,pGottenData,sizeof(pGottenData));
-		QString value(c);
-		printf("***************written data....*************************************************************\n");
-		printf("***************<%s>***********************************************\n",qPrintable(value));
-		e.setAttribute("value",value);
-		}
-	return true;
-	}
 private:
     };
-
-template<class T> class XmlDataLib
+/**
+ *@brief CXmlDataLib is the public accessClass to our configuration XML Files
+ *CXmlDataLib gives you an easy access to our XML DataFiles. Important for this handling is, that the
+ *file has to have the correct name ("objects.xml") and it has to be in the same directory, the binary file is.
+ *Also, if you have errors, please check the logging, it should get you access to what problems you had.
+ *
+ *@author marco
+ *@date 26.10.2010
+ */
+class CXmlDataLib: private CXmlHandler
     {
 public:
+    /**
+     * The Constructor XmlDatalib reads per default de value of the objects.xml file with the given
+     * object name
+     * @param objName -  objectName you want to access
+     */
+    CXmlDataLib(QString objName);
+    /**
+     * No special destructor behaviour
+     */
+    ~CXmlDataLib();
 
-    XmlDataLib(QString objName, QString Filename = "")
-	{
-	initData();
-	XmlRead getData;
-	readObjName = objName;
+    /*
+     *With the method data, you can get access to the data, you read before with the constructor or the refresh function
+     *@return data from the initialized objectname
+     */
+    QString data();
 
-	if (!getData.readData(&m_data, "objects.xml", readObjName))//fixme xmlfile irgendwie dynamisch übergeben. Konstruktor?
-	    printf("shitz happenedz!\n"); //FIXME loggerklasse einbauen
-	}
+    /**
+     *The refresh method "refreshes" the values of the objectData and objectType
+     */
+    bool refresh();
 
-    ~XmlDataLib()
-	{
-	}
-
-    T& data()
-	{
-	return m_data;
-	}
-
-    XmlDataLib<T>& operator=(const XmlDataLib<T>& other)
-      {
-          m_data = other.m_data;
-          printf("working?");
-          writeToXML();
-          return *this;
-      };
-
+    /**
+     * This operator overload is used, to write data into the xmlFile we have initialized with the constructor
+     * @param iData - this Data will be written into the XMLFile
+     */
+    CXmlDataLib operator=(QString iData);
 private:
 
-    void initData()
-	{
-	memset(&m_data, 0, sizeof(T));
-	}
+    /**
+     * For special purposes you might want to know the Type of the data you read. With the Method "giveType" this is possible
+     * @warning At this time this method is not implemented or usable.
+     * @return Type of the initialized objectname
+     */
+    QString giveType();
 
-    void writeToXML()
-	{
-	XmlRead writeData;
-	printf("blub");
-	if(!writeData.writeData(&m_data,"objects.xml",readObjName))
-	    printf("shitz happenedz!\n"); //FIXME Loggerklasse einbauen
-	}
-
-    T m_data; ///< die Daten von \a m_plName
+    QString objData;
+    QString objType;
     QString readObjName;
     };
 
-//Application Includes
-
-/****************************************************************************/
-
 #endif
-

@@ -9,6 +9,8 @@
 //QT Includes
 
 //Library Includes
+#include "stdio.h"
+#include "iostream"
 
 //Application Includes
 #include "data_defines.h"
@@ -29,9 +31,14 @@
 
 int main (int argc, char** argv)
     {
-    XmlDataLib<int> dat(DATA_OBJECTTYPE);
-    printf("%d \n",dat.data());
-    printf("%d \n",dat.data());
+
+    CXmlDataLib x(DATA_OBJECTTYPE);
+    std::cout<<qPrintable(x.data());
+    QString xhallo;
+    xhallo="hi";
+    x=xhallo;
+    x.refresh();
+    std::cout<<qPrintable(x.data());
     getchar();
     return 0;
     }
