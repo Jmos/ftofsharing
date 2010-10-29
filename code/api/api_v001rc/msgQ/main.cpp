@@ -6,7 +6,6 @@
 // Beschreibung:
 //=================================================================
 
-
 #include <QStringList>
 #include <QDomDocument>
 #include <QString>
@@ -19,6 +18,7 @@
 #include <conio.h>
 #endif
 #include <iostream>
+#include <QUdpSocket>
 
 #include "msgQ.h"
 
@@ -31,22 +31,14 @@ int main (int argc, char** argv)
  msgQID= MessageQ.AddMessageQ();
 
  cout << "MessageQID: " << msgQID << endl;
-#ifdef WIN32
- getch();
-#else
  getchar();
-#endif
 
  MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist ein Test!");
  MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist noch ein Test!");
 
  cout << "Send OK" << endl;
 
-#ifdef WIN32
- getch();
-#else
  getchar();
-#endif
 
  int RxID;
  QString Message;
@@ -57,18 +49,10 @@ int main (int argc, char** argv)
  MessageQ.ReceiveMessage(msgQID, 6, RxID, Message);
  std::cout << RxID << " sagt: " << qPrintable(Message) << endl;
 
-#ifdef WIN32
- getch();
-#else
  getchar();
-#endif
 
  MessageQ.DeleteMessageQ(msgQID);
 
-#ifdef WIN32
- getch();
-#else
  getchar();
-#endif
  return 0;
 }

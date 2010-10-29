@@ -42,14 +42,6 @@ class TMessageQ
 
  public:
 
-  TMessageQ()
-  {
-  }
-
-  ~TMessageQ()
-  {
-  }
-
   int AddMessageQ();
   bool DeleteMessageQ(int iMessageQID);
   bool SendMessage(int iMessageQID, int iMyID, int iRemoteID, QString iMessage);

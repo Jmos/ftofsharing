@@ -22,6 +22,7 @@ INCLUDEPATH += ./include \
 
 TARGET = ./msgQ
 TARGET += ./msgQ
+RC_FILE = res.rc
 
 ############################# Dependencies ##################################
 
@@ -29,7 +30,7 @@ DEPENDPATH += ;$$INCLUDEPATH
 
 ############################# QT Libraries ##################################
 
-QT += core xml xmlpatterns
+QT += core xml xmlpatterns network
 
 ########################## Configuration Options ############################
 
@@ -38,6 +39,7 @@ CONFIG +=   warn_on \
             silent \
             resources \
             console \
+            network
 
 ###################### Intermediate Output Directories ######################
 
