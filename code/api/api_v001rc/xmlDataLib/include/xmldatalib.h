@@ -85,6 +85,9 @@ public:
      * @param iData - this Data will be written into the XMLFile
      */
     CXmlDataLib operator=(QString iData);
+
+    void Write2Xml(QString iData);
+
 private:
 
     /**

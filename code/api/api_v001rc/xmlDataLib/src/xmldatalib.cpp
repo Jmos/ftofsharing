@@ -58,14 +58,14 @@ QString CXmlDataLib::giveType()
     return false;
     }
 
-CXmlDataLib CXmlDataLib::operator =(QString iData)
+CXmlDataLib CXmlDataLib::operator = (QString iData)
+{
+    std::cout << "test\n";
+    if (!writeData (readObjName, iData))
     {
-    std::cout<<"test\n";
-    if(!writeData(readObjName,iData))
-	{
-	std::cout<<"Failed to write data!";
-	}
+        std::cout << "Failed to write data!";
     }
+}
 
 
 /**************************************************************************************/
@@ -201,13 +201,23 @@ bool CXmlHandler::writeData(QString objName,QString input)
     if (e.hasAttribute("value"))
 	{
 	e.setAttribute("value", input);
+	std::cout << qPrintable(objectDoc.toString());
 	}
     else
 	{
-	std::cout<<"NO ATTRIBUTE CALLED VALUE!";
+	std::cout<<"NO ATTRIBUTE CALLED VALUE!" << std::endl;
 	}
     return true;
     }
 
 /**************************************************************************************/
+
+void CXmlDataLib::Write2Xml(QString iData)
+{
+    std::cout << "test\n";
+    if (!writeData (readObjName, iData))
+    {
+        std::cout << "Failed to write data!";
+    }
+}
 

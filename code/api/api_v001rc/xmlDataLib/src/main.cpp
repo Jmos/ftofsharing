@@ -36,7 +36,10 @@ int main (int argc, char** argv)
     std::cout<<qPrintable(x.data());
     QString xhallo;
     xhallo="hi";
-    x=xhallo;
+    //x=xhallo;
+
+   x.Write2Xml(xhallo);
+
     x.refresh();
     std::cout<<qPrintable(x.data());
     getchar();
