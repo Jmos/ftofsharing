@@ -55,12 +55,18 @@ QString CUdpSocket::ReceiveText()
 
 bool CUdpSocket::WaitForReceiveText()
 {
+ if (hasPendingDatagrams())
+    return true;
+
  return waitForReadyRead();
 }
 //-----------------------------------------------------------------
 
 bool CUdpSocket::WaitForReceiveText(int iMilliSeconds)
 {
+ if (hasPendingDatagrams())
+    return true;
+
  return waitForReadyRead(iMilliSeconds);
 }
 //-----------------------------------------------------------------

@@ -12,10 +12,7 @@
 //-----------------------------------------------------------------
 
 #include <QUdpSocket>
-#include <QObject>
 #include <QString>
-#include <iostream>
-#include <QApplication>
 //-----------------------------------------------------------------
 
 /**
@@ -36,14 +33,13 @@ class CUdpSocket : private QUdpSocket
 
  public:
 
-  QString ReceiveText();
-
   void SetSenderPort(int iPort);
   int  GetSenderPort();
   bool ListenOnPort(int iPort);
   bool SendText(QString iData, QHostAddress iReceiverAddress, int iReceiverPort);
   bool WaitForReceiveText();
   bool WaitForReceiveText(int iMilliSeconds);
+  QString ReceiveText();
 
 };
 //-----------------------------------------------------------------
