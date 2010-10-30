@@ -14,11 +14,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <stdio.h>
-#ifdef WIN32
-#include <conio.h>
-#endif
 #include <iostream>
-#include <QUdpSocket>
+
 
 #include "msgQ.h"
 
@@ -33,21 +30,20 @@ int main (int argc, char** argv)
  cout << "MessageQID: " << msgQID << endl;
  getchar();
 
- MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist ein Test!");
- MessageQ.SendMessage(msgQID, 5, 6, "Hallo, das ist noch ein Test!");
+ MessageQ.SendMessage(msgQID, 6, "Hallo, das ist ein Test!");
+ MessageQ.SendMessage(msgQID, 6, "Hallo, das ist noch ein Test!");
 
  cout << "Send OK" << endl;
 
  getchar();
 
- int RxID;
  QString Message;
 
- MessageQ.ReceiveMessage(msgQID, 6, RxID, Message);
- std::cout << RxID << " sagt: " << qPrintable(Message) << endl;
+ MessageQ.ReceiveMessage(msgQID, 6, Message);
+ std::cout << "Message1: " << qPrintable(Message) << endl;
 
- MessageQ.ReceiveMessage(msgQID, 6, RxID, Message);
- std::cout << RxID << " sagt: " << qPrintable(Message) << endl;
+ MessageQ.ReceiveMessage(msgQID, 6, Message);
+ std::cout << "Message2: " << qPrintable(Message) << endl;
 
  getchar();
 

@@ -17,8 +17,7 @@
 
 struct RMessage
 {
- int Transmitter;
- int Receiver;
+ int ReceiverID;
  QString Message;
  QTime Timestamp;
 };
@@ -40,9 +39,9 @@ class TMessageList
   {
   }
 
-  void SendMessage(int TxID, int RxID, QString MessageString);
-  void SendMessage(int TxID, QList<int> RxID, QString MessageString);
-  bool ReceiveMessage(int PeerID, QString &Message, int &RxID, QTime &Timestamp);
+  void SendMessage(int iReceiverID, QString iMessage);
+  void SendMessage(QList<int> ReceiverID, QString iMessage);
+  bool ReceiveMessage(int iMyID, QString &oMessage, QTime &oTimestamp);
   void ClearMessageList();
   int GetMessageQID();
 };

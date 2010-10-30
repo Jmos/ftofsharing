@@ -22,7 +22,6 @@ INCLUDEPATH += ./include \
 
 TARGET = ./msgQ
 TARGET += ./msgQ
-RC_FILE = res.rc
 
 ############################# Dependencies ##################################
 

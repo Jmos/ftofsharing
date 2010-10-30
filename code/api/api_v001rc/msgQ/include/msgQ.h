@@ -44,9 +44,9 @@ class TMessageQ
 
   int AddMessageQ();
   bool DeleteMessageQ(int iMessageQID);
-  bool SendMessage(int iMessageQID, int iMyID, int iRemoteID, QString iMessage);
-  bool ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage);
-  bool ReceiveMessage(int iMessageQID, int iMyID, int &oRemoteID, QString &oMessage, QTime &oTimestamp);
+  bool SendMessage(int iMessageQID, int iReceiverID, QString iMessage);
+  bool ReceiveMessage(int iMessageQID, int iMyID, QString &oMessage);
+  bool ReceiveMessage(int iMessageQID, int iMyID, QString &oMessage, QTime &oTimestamp);
 };
 //-----------------------------------------------------------------
 

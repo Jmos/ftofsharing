@@ -4,44 +4,41 @@
 //-----------------------------------------------------------------
 
 
-void TMessageList::SendMessage(int TxID, int RxID, QString MessageString)
+void TMessageList::SendMessage(int iReceiverID, QString iMessage)
 {
  RMessage Message;
 
- Message.Message= MessageString;
+ Message.Message= iMessage;
  Message.Timestamp= QTime::currentTime();
- Message.Transmitter= TxID;
- Message.Receiver= RxID;
+ Message.ReceiverID= iReceiverID;
 
  cMessageList.append(Message);
 }
 //-----------------------------------------------------------------
 
-void TMessageList::SendMessage(int TxID, QList<int> RxID, QString MessageString)
+void TMessageList::SendMessage(QList<int> iReceiverID, QString iMessage)
 {
  RMessage Message;
 
- Message.Message= MessageString;
+ Message.Message= iMessage;
  Message.Timestamp= QTime::currentTime();
- Message.Transmitter= TxID;
 
- for (int Index= 0; Index < RxID.size(); Index++)
+ for (int Index= 0; Index < iReceiverID.size(); Index++)
 	{
-	 Message.Receiver= RxID.at(Index);
+	 Message.ReceiverID= iReceiverID.at(Index);
 	 cMessageList.append(Message);
 	}
 }
 //-----------------------------------------------------------------
 
-bool TMessageList::ReceiveMessage(int MyID, QString &Message, int &TxID, QTime &Timestamp)
+bool TMessageList::ReceiveMessage(int iMyID, QString &oMessage, QTime &oTimestamp)
 {
- for (int Index= cMessageList.size()-1; Index >= 0; Index--)
+ for (int Index= 0; Index < cMessageList.size(); Index++)
 	 {
-	  if (cMessageList.at(Index).Receiver == MyID);
+	  if (cMessageList.at(Index).ReceiverID == iMyID);
 		 {
-		  Message= cMessageList.at(Index).Message;
-		  TxID= cMessageList.at(Index).Transmitter;
-		  Timestamp= cMessageList.at(Index).Timestamp;
+		  oMessage= cMessageList.at(Index).Message;
+		  oTimestamp= cMessageList.at(Index).Timestamp;
 
 		  cMessageList.removeAt(Index);
 
