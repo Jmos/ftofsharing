@@ -10,6 +10,7 @@
 #include <QString>
 #include <QDomElement>
 #include <QFile>
+#include <QTextStream>
 // Std Includes
 
 // Linux Includes
@@ -162,7 +163,7 @@ bool CXmlHandler::writeData(QString objName,QString input)
 
     std::cout<<"bla\n";
     QFile xmlData("objects.xml");
-
+    xmlData.open(QIODevice::ReadOnly);
     QDomDocument objectDoc("objectType");
     QString errMsg;
 
@@ -173,6 +174,7 @@ bool CXmlHandler::writeData(QString objName,QString input)
 	std::cout<<"***************couldn't set content for DOM!. Errmsg:"<<qPrintable(errMsg)<<"**************";
 	return false;
 	}
+    xmlData.close();
 
     if (!objectDoc.hasChildNodes())
 	{
@@ -202,6 +204,10 @@ bool CXmlHandler::writeData(QString objName,QString input)
 	{
 	e.setAttribute("value", input);
 	std::cout << qPrintable(objectDoc.toString());
+	xmlData.open(QIODevice::ReadWrite|QIODevice::Truncate);
+	QTextStream out(&xmlData);
+	out << objectDoc.toString();
+	xmlData.close();
 	}
     else
 	{
