@@ -27,7 +27,7 @@ int main (int argc, char** argv)
 {
  CPop3Client pop;
 
- pop.GetMail(1 ,"pop.tele2.at", "h.saxl@tele2.at", "cibfhr1m");
+ pop.GetMail(1 ,"", "", "");
 
  cout << "\n\nErrorCode: " << pop.GetLastErrorCode() << endl;
 
