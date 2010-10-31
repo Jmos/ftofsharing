@@ -1,4 +1,11 @@
 <!DOCTYPE objectTypeML>
-<objectType type="Struct1" >
- <Object value="hi" type="INT" />
-</objectType>
+<xmlParams>
+ <Hierarchy>
+  <intValue value="1" type="INT"/>
+  <doubleValue value="1.5" type="INT"/>
+ </Hierarchy>
+ <Hierarchy2>
+  <intValue2 value="1" type="INT"/>
+  <doubleValue2 value="2.5" type="INT"/>
+ </Hierarchy2>
+</xmlParams>
