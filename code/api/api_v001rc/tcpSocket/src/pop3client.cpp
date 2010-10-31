@@ -16,11 +16,19 @@ CPop3Client::CPop3Client()
 }
 //-----------------------------------------------------------------
 
+CPop3Client::CPop3Client(QString iHostName)
+{
+ cHostName= iHostName;
+
+ Initialise();
+}
+//-----------------------------------------------------------------
+
 CPop3Client::CPop3Client(QString iHostName, QString iUserName, QString iPassWord)
 {
- cHostName=  iHostName;
- cUserName=  iUserName;
- cPassWord=  iPassWord;
+ cHostName= iHostName;
+ cUserName= iUserName;
+ cPassWord= iPassWord;
 
  Initialise();
 }
@@ -33,7 +41,6 @@ void CPop3Client::Initialise()
 }
 //-----------------------------------------------------------------
 
-
 EErrorCode CPop3Client::GetLastErrorCode()
 {
  EErrorCode CurrentErrorCode= cLastError;
@@ -45,38 +52,30 @@ EErrorCode CPop3Client::GetLastErrorCode()
 
 int CPop3Client::GetMailCount()
 {
- return GetMailCount(cHostName, cUserName, cPassWord);
+ return GetMailCount(cHostName, cUserName, cPassWord, true);
 }
 //-----------------------------------------------------------------
 
 int CPop3Client::GetMailCount(QString iUserName, QString iPassWord)
 {
- return GetMailCount(cHostName, iUserName, iPassWord);
+ return GetMailCount(cHostName, iUserName, iPassWord, true);
 }
 //-----------------------------------------------------------------
 
 int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPassWord)
 {
+ return GetMailCount(iHostName, iUserName, iPassWord, true);
+}
+//-----------------------------------------------------------------
+
+int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPassWord, bool iDisconnect)
+{
  QString RxBuffer;
  bool    CorrectConversion;
  int     EMailCount;
 
-
- if (iHostName.isEmpty())
-    {
-     cLastError= INVALIDHOSTNAME;
-     return -1;
-    }
- if (iUserName.isEmpty())
-    {
-     cLastError= INVALIDUSERNAME;
-     return -1;
-    }
- if (iPassWord.isEmpty())
-    {
-     cLastError= INVALIDPASSWORD;
-     return -1;
-    }
+ if (!CheckParams(iHostName, iHostName, iPassWord))
+    return -1;
 
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
     return -1;
@@ -87,14 +86,10 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
      return -1;
     }
 
-
- if (!cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
-    {
-     cLastError= NORESPONSEFROMSERVER;
-     return -1;
-    }
-
  RxBuffer= cTcpSocket.WaitAndReceiveText(cMaxServerTimeOut);
+
+ if (iDisconnect)
+    cTcpSocket.Disconnect();
 
  if (RxBuffer.isEmpty())
     {
@@ -102,7 +97,7 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
      return -1;
     }
 
- if (RxBuffer.indexOf("+OK") == -1)
+ if (!RxBuffer.contains("+OK"))
     {
      cLastError= UNKNOWNSERVERERROR;
      return -1;
@@ -112,10 +107,76 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
 
  if (CorrectConversion)
     return EMailCount;
-    else
-        cLastError= UNKNOWNSERVERERROR;
 
+ cLastError= UNKNOWNSERVERERROR;
  return -1;
+}
+//-----------------------------------------------------------------
+
+REMail *CPop3Client::GetMail(int iMailIndex)
+{
+ return GetMail(iMailIndex, cHostName, cUserName, cPassWord);
+}
+//-----------------------------------------------------------------
+
+REMail *CPop3Client::GetMail(int iMailIndex, QString iUserName, QString iPassWord)
+{
+ return GetMail(iMailIndex, cHostName, iUserName, iPassWord);
+}
+//-----------------------------------------------------------------
+
+REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord)
+{
+ REMail *Mail = new REMail();
+ QList<QString> RxBuffer;
+ //QString RxBuffer;
+ int MailCount;
+
+ if (!CheckParams(iHostName, iUserName, iPassWord))
+    return NULL;
+
+ MailCount= GetMailCount(iHostName, iUserName, iPassWord, true);
+
+ if (!ServerLogIn(iHostName, iUserName, iPassWord))
+    return NULL;
+
+ if (iMailIndex <= 0)
+    {
+     cLastError= MAILINDEXOUTOUBOUNDS;
+     return NULL;
+    }
+ if (MailCount == -1)
+    return NULL;
+ if (MailCount == 0)
+    {
+     cLastError= EMPTYMAILBOX;
+     return NULL;
+    }
+ if (MailCount < iMailIndex)
+    {
+     cLastError= MAILINDEXOUTOUBOUNDS;
+     return NULL;
+    }
+
+ if (!cTcpSocket.SendText("RETR " + QString::number(iMailIndex) + "\n\r"))
+    {
+     cLastError= SENDINGERROR;
+     return false;
+    }
+ if (!cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
+    {
+     cLastError= NORESPONSEFROMSERVER;
+     return false;
+    }
+
+ cTcpSocket.ReceiveLines(RxBuffer);
+
+ //cTcpSocket.ReceiveText();
+
+  //std::cout << RxBuffer.size();
+  //std::cout << qPrintable(RxBuffer);
+
+ return Mail;
 }
 //-----------------------------------------------------------------
 
@@ -188,4 +249,27 @@ bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPas
  return false;
 }
 //-----------------------------------------------------------------
+
+bool CPop3Client::CheckParams(QString iHostName, QString iUserName, QString iPassWord)
+{
+ if (iHostName.isEmpty())
+ {
+  cLastError= INVALIDHOSTNAME;
+  return false;
+ }
+if (iUserName.isEmpty())
+ {
+  cLastError= INVALIDUSERNAME;
+  return false;
+ }
+if (iPassWord.isEmpty())
+ {
+  cLastError= INVALIDPASSWORD;
+  return false;
+ }
+
+ return true;
+}
+//-----------------------------------------------------------------
+
 

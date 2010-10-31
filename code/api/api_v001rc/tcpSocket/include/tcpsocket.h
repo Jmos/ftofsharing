@@ -7,6 +7,7 @@
 #include <QString>
 #include <QObject>
 #include <QHostAddress>
+#include <iostream>
 //-----------------------------------------------------------------
 
 /**
@@ -26,31 +27,30 @@ class CTcpSocket : public QObject
 {
  Q_OBJECT
 
-  QTcpSocket cTcpSocket;
-
-  bool cConnected;
+  QTcpSocket   cTcpSocket;
+  bool         cConnected;
+  QTextStream *cSocketStream;
 
  public:
 
   CTcpSocket();
 
-  bool ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 30000);
-  bool ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 30000);
-  void Disconnect();
-  bool IsConnected();
-  bool SendText(QString iData);
-  bool WaitForReceiveText();
-  bool WaitForReceiveText(int iTimeOutMs);
+  bool    ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 30000);
+  bool    ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 30000);
+  void    Disconnect();
+  bool    IsConnected();
+  bool    SendText(QString iData);
+  bool    WaitForReceiveText();
+  bool    WaitForReceiveText(int iTimeOutMs);
   QString ReceiveText();
+  bool    ReceiveLines(QList<QString> &oStringList);
   QString WaitAndReceiveText();
   QString WaitAndReceiveText(int iTimeOutMs);
-
 
  private slots:
 
   void Connected();
   void Disconnected();
-
 };
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------

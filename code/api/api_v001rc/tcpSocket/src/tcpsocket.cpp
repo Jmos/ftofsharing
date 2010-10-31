@@ -13,7 +13,8 @@ CTcpSocket::CTcpSocket()
 {
  cConnected= false;
 
- //connect(&cTcpSocket, SIGNAL(disconnected()), &cTcpSocket, SLOT(deleteLater()));
+ cSocketStream= new QTextStream(&cTcpSocket);
+
  connect(&cTcpSocket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
  connect(&cTcpSocket, SIGNAL(connected()), this, SLOT(Connected()));
 }
@@ -38,7 +39,7 @@ bool CTcpSocket::ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS)
 
  cTcpSocket.connectToHost(iHostAddress, (quint16)iPort);
 
- return cTcpSocket.waitForConnected();//iTimeoutMS);
+ return cTcpSocket.waitForConnected();
 }
 //-----------------------------------------------------------------
 
@@ -49,7 +50,7 @@ bool CTcpSocket::ConnectTo(QString iHostName, int iPort, int iTimeoutMS)
 
  cTcpSocket.connectToHost(iHostName, (quint16)iPort);
 
- return cTcpSocket.waitForConnected();//iTimeoutMS);
+ return cTcpSocket.waitForConnected(iTimeoutMS);
 }
 //-----------------------------------------------------------------
 
@@ -114,6 +115,8 @@ QString CTcpSocket::ReceiveText()
  if (cTcpSocket.bytesAvailable() == 0)
     return "";
 
+ //std::cout << "Bytes: " << cTcpSocket.bytesAvailable() << std::endl;
+
  QByteArray RxBuffer(cTcpSocket.bytesAvailable(), 0);
 
  RxBuffer= cTcpSocket.read(RxBuffer.size());
@@ -121,6 +124,27 @@ QString CTcpSocket::ReceiveText()
  QString RxData(RxBuffer);
 
  return RxData;
+}
+//-----------------------------------------------------------------
+
+bool CTcpSocket::ReceiveLines(QList<QString> &oStringList)
+{
+ if (!cConnected)
+    return false;
+
+ if (cTcpSocket.bytesAvailable() == 0)
+    return false;
+
+ QString RxData;
+
+ //std::cout << "Bytes: " << cTcpSocket.bytesAvailable() << std::endl;
+
+ while (cTcpSocket.bytesAvailable() > 0)
+ {
+  oStringList.append(cTcpSocket.readLine());
+ }
+
+ return true;
 }
 //-----------------------------------------------------------------
 

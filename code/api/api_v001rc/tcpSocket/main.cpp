@@ -27,9 +27,9 @@ int main (int argc, char** argv)
 {
  CPop3Client pop;
 
- int i= pop.GetMailCount("pop.utanet.at", "saxlruth", "cibfhr1m");
+ pop.GetMail(1 ,"pop.tele2.at", "h.saxl@tele2.at", "cibfhr1m");
 
- cout << i << endl;
+ cout << "\n\nErrorCode: " << pop.GetLastErrorCode() << endl;
 
 
 
