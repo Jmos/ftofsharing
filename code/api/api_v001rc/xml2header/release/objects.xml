@@ -1,0 +1,15 @@
+<!DOCTYPE objectTypeML>
+<xmlParams>
+	<Hierarchy>
+		<intValue value="1" type="INT">
+		</intValue>
+		<doubleValue value="1" type="INT">
+		</doubleValue>
+	</Hierarchy>
+	<Hierarchy2>
+		<intValue2 value="1" type="INT">
+		</intValue2>
+		<doubleValue2 value="1" type="INT">
+		</doubleValue2>
+	</Hierarchy2>
+</xmlParams>

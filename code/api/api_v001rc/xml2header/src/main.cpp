@@ -25,7 +25,7 @@ typedef struct _XMLStruct
 int main()
     {
     //Xmlfile has to be in res/objects.xml!
-    QFile resData("./res/objects.xml");
+    QFile resData("./release/objects.xml");
 
     //
     if (!resData.open(QIODevice::ReadOnly))
@@ -49,36 +49,42 @@ int main()
 
     out << "// Begin writing data from objects.xml \n\n\n";
 
-    QDomDocument objectDoc("objectType");
+    QDomDocument objectDoc("objectTypeML");
     QString errMsg;
-    if (!objectDoc.setContent(&resData, &errMsg))
+    int col = 0;
+    int row = 0;
+    if (!objectDoc.setContent(&resData, &errMsg,&row,&col))
 	{
 	resData.close();
 	printf(
-		"***************couldn't set content for DOM!. Errmsg: <%s>***************\n",
-		qPrintable(errMsg));
+		"***************couldn't set content for DOM!. Errmsg: <%s>, line: <%d>, col: <%d>***************\n",
+		qPrintable(errMsg),row,col);
 	return -1;
 	}
     resData.close();
 
-    QDomElement root = objectDoc.documentElement();
+    QDomElement mainRoot = objectDoc.documentElement();
+    QDomElement hierarchyRoot = mainRoot.firstChildElement();
     QList<XMLStruct> fileEntrys;
-    while (!root.isNull())
+    while (!hierarchyRoot.isNull())
 	{
-	QDomElement e = root.toElement();
-	if (!e.isNull())
+	QDomElement Elements = hierarchyRoot.firstChildElement();
+	while(!Elements.isNull())
 	    {
-	    XMLStruct values;
-	    values.name = e.tagName();
-	    values.Struct = e.attribute("type", "");
-
-	    printf("******************name of object:<%s> objectstruct:<%s>\n",
-		    qPrintable(values.name), qPrintable(values.Struct));
-	    fileEntrys.append(values);
-	    //                }
+	    if (!Elements.isNull())
+		{
+		XMLStruct values;
+		values.name = Elements.tagName();
+		values.Struct = Elements.attribute("type", "");
+		printf("******************name of object:<%s> objectstruct:<%s>\n", qPrintable(values.name), qPrintable(values.Struct));
+		fileEntrys.append(values);
+		}
+	    Elements = Elements.nextSiblingElement();
 	    }
-	root = root.nextSiblingElement();
+	hierarchyRoot = hierarchyRoot.nextSiblingElement();
 	}
+
+
     for (int i = 0; i < fileEntrys.size(); i++)
 	{
 	out << "#define DATA_" << fileEntrys[i].name.toUpper();

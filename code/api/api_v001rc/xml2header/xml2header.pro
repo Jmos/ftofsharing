@@ -13,8 +13,8 @@ SOURCES += 	./src/main.cpp
 ############################# Resource Files ##################################
 
 
-TARGET = ./bin/xxml2header
-TARGET += ./bin/xxml2header
+TARGET = ./release/xxml2header
+TARGET += ./release/xxml2header
 
 ############################# Dependencies ##################################
 
