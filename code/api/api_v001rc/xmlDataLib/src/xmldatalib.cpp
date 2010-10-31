@@ -83,6 +83,7 @@ CXmlHandler::~CXmlHandler()
 
 bool CXmlHandler::readData(QString objName,QString& output)
     {
+    bool bFound = false;
     if(objName.isEmpty())
 	{
 	std::cout<<"***********ERROR*********\n";
@@ -111,49 +112,45 @@ bool CXmlHandler::readData(QString objName,QString& output)
 	return false;
 	}
 
-    QDomNodeList nodes = objectDoc.elementsByTagName(objName);
+    QDomElement mainRoot = objectDoc.documentElement();
+    QDomElement hierarchyRoot = mainRoot.firstChildElement();
+    while (!hierarchyRoot.isNull() && !bFound)
+	{
+	QDomElement Elements = hierarchyRoot.firstChildElement();
+	while(!Elements.isNull() && !bFound)
+	    {
+	    if(Elements.tagName() == objName)
+		{
+		if (Elements.hasAttribute("value"))
+		    {
+		    output=Elements.attribute("value", "30");
+		    bFound=true;
+		    }
+		else
+		    {
+		    std::cout<<"no attribute called value!\n";
+		    }
+		}
+	    Elements = Elements.nextSiblingElement();
+	    }
 
-    if (nodes.size() > 1)
-	{
-	std::cout<<"***************WARNING********************************************************\n";
-	std::cout<<"********There is more than one object with that name! Taking first one********\n";
+	hierarchyRoot = hierarchyRoot.nextSiblingElement();
 	}
 
-    QDomNode n = nodes.item(0);
-    if (!n.hasChildNodes())
+    if(!bFound)
 	{
-	std::cout<<"***************ERROR*************************************************************\n";
-	std::cout<<"***************Node has no Child nodes*************************************\n";
+	std::cout<<"******************************ERROR****************************";
+	std::cout<<"*********************No element in Hierarchies called"<<qPrintable(objName)<<"***************";
+	return false;
 	}
-    QDomNodeList subNodes = n.childNodes();
-    for (int x = 0; x < subNodes.size(); x++)
-	{
-	if (!subNodes.item(x).isElement())
-	    {
-	    std::cout<<"***************ERROR*************************************************************\n";
-	    std::cout<<"***************Node is no element!***********************************************\n";
-	    return false;
-	    }
-	QDomElement e = subNodes.item(x).toElement();
-	if (e.hasAttribute("value"))
-	    {
-	    printf("<%s>\n", qPrintable(e.attribute("value", "30")));
-	    output=e.attribute("value", "30");
-	    }
-	else
-	    {
-	    std::cout<<"***************ERROR*************************************************************\n";
-	    std::cout<<"***************Node found as number <%d> has no elementattribute called value****\n";
-	    std::cout<<"***************Elementname:"<<qPrintable(e.tagName())<<", Attributename: "<<qPrintable(e.text())<<"****************************\n";
-	    return false;
-	    }
-	}
+
     return true;
     }
 
 bool CXmlHandler::writeData(QString objName,QString input)
     {
 
+    bool bFound = false;
     if(objName.isEmpty() || input.isEmpty())
 	{
 	std::cout<<"***********ERROR*********\n";
@@ -168,13 +165,13 @@ bool CXmlHandler::writeData(QString objName,QString input)
     QString errMsg;
 
     if (!objectDoc.setContent(&xmlData, &errMsg))
-	{
-	xmlData.close();
-	std::cout<<"***************ERROR****************************************************\n";
-	std::cout<<"***************couldn't set content for DOM!. Errmsg:"<<qPrintable(errMsg)<<"**************";
-	return false;
-	}
-    xmlData.close();
+    	{
+    	xmlData.close();
+    	std::cout<<"***************ERROR****************************************************\n";
+    	std::cout<<"***************couldn't set content for DOM!. Errmsg:"<<qPrintable(errMsg)<<"**************";
+    	return false;
+    	}
+        xmlData.close();
 
     if (!objectDoc.hasChildNodes())
 	{
@@ -182,36 +179,45 @@ bool CXmlHandler::writeData(QString objName,QString input)
 	std::cout<<"***************objectdoc has no Child nodes*****************************\n";
 	return false;
 	}
-    QDomNodeList nodes = objectDoc.elementsByTagName(objName);
 
-    QDomNode n = nodes.item(0);
-    if (!n.hasChildNodes())
+    QDomElement mainRoot = objectDoc.documentElement();
+    std::cout<<qPrintable(mainRoot.tagName())<<"\n";
+    QDomElement hierarchyRoot = mainRoot.firstChildElement();
+    std::cout<<qPrintable(hierarchyRoot.tagName())<<"\n";
+    while (!hierarchyRoot.isNull() && !bFound)
 	{
-	std::cout<<"***************ERROR*************************************************************\n";
-	std::cout<<"***************Node has no Child nodes**************************************\n";
+	QDomElement Elements = hierarchyRoot.firstChildElement();
+	std::cout<<qPrintable(Elements.tagName())<<"\n";
+	std::cout<<qPrintable(objName)<<"\n";
+	while(!Elements.isNull() && !bFound)
+	    {
+	    if(Elements.tagName() == objName)
+		{
+		if (Elements.hasAttribute("value"))
+		    {
+		    Elements.setAttribute("value", input);
+		    std::cout << qPrintable(objectDoc.toString());
+		    xmlData.open(QIODevice::ReadWrite|QIODevice::Truncate);
+		    QTextStream out(&xmlData);
+		    out << objectDoc.toString();
+		    xmlData.close();
+		    bFound=true;
+		    }
+		else
+		    {
+		    std::cout<<"NO ATTRIBUTE CALLED VALUE!" << std::endl;
+		    }
+		}
+	    Elements = Elements.nextSiblingElement();
+	    }
+	hierarchyRoot = hierarchyRoot.nextSiblingElement();
 	}
-    QDomNodeList subNodes = n.childNodes();
 
-    if (!subNodes.item(0).isElement())
+    if(!bFound)
 	{
-	std::cout<<"***************ERROR*************************************************************\n";
-	std::cout<<"***************Node is no element!***********************************************\n";
+	std::cout<<"******************************ERROR****************************";
+	std::cout<<"*********************No element in Hierarchies called"<<qPrintable(objName)<<"***************";
 	return false;
-	}
-
-    QDomElement e = subNodes.item(0).toElement();
-    if (e.hasAttribute("value"))
-	{
-	e.setAttribute("value", input);
-	std::cout << qPrintable(objectDoc.toString());
-	xmlData.open(QIODevice::ReadWrite|QIODevice::Truncate);
-	QTextStream out(&xmlData);
-	out << objectDoc.toString();
-	xmlData.close();
-	}
-    else
-	{
-	std::cout<<"NO ATTRIBUTE CALLED VALUE!" << std::endl;
 	}
     return true;
     }

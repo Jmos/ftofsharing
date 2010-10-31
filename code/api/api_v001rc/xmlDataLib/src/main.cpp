@@ -31,14 +31,13 @@
 
 int main (int argc, char** argv)
     {
-
-    CXmlDataLib x(DATA_OBJECTTYPE);
+    CXmlDataLib x(DATA_INTVALUE2);
     std::cout<<qPrintable(x.data());
     QString xhallo;
-    xhallo="hi";
-    //x=xhallo;
+    xhallo="1";
+    x=xhallo;
 
-   x.Write2Xml(xhallo);
+    x.Write2Xml(xhallo);
 
     x.refresh();
     std::cout<<qPrintable(x.data());
