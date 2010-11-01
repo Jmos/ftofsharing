@@ -10,6 +10,12 @@
 #include <QString>
 //API Includes
 
+typedef struct __READ_DATA_RETURN__
+	{
+	QString value;
+	QString type;
+	}readDataReturn;
+
 
 /**
  * @brief CXmlHandler is the private "under the hood" access class to our XML Files
@@ -35,14 +41,14 @@ public:
      *@param output - The Value, which is now actual in this object
      *@return true if it worked, false if not. If false see log
      */
-    bool readData(QString objName, QString &output);
+    bool readData(QString objName, readDataReturn &output);
     /**
      *The method writeData accesses an object with objName and writes input in the object
      *@param objName - objName stands here for the to accessing object
      *@param input - The Value you want to write in the object
      *@return true if it worked, false if not. If false see log
      */
-    bool writeData(QString objName, QString input);
+    bool writeData(QString objName, readDataReturn input);
 
 private:
     };
@@ -84,18 +90,26 @@ public:
      * This operator overload is used, to write data into the xmlFile we have initialized with the constructor
      * @param iData - this Data will be written into the XMLFile
      */
-    CXmlDataLib operator=(QString iData);
+    CXmlDataLib operator=(QString);
 
-    void Write2Xml(QString iData);
-
-private:
+    /**
+     * This operator overload is also used to write data into the xmlFile.
+     * You should only use this, when you want to change the type of the entry
+     * @see operator=(QString)
+     * @param readDataReturn iData - incoming data
+     */
+    CXmlDataLib operator=(readDataReturn);
 
     /**
      * For special purposes you might want to know the Type of the data you read. With the Method "giveType" this is possible
      * @warning At this time this method is not implemented or usable.
      * @return Type of the initialized objectname
      */
-    QString giveType();
+    QString giveType(bool forceRefresh=false);
+
+
+private:
+
 
     QString objData;
     QString objType;

@@ -32,16 +32,16 @@
 int main (int argc, char** argv)
     {
     CXmlDataLib x(DATA_INTVALUE2);
-    std::cout<<qPrintable(x.data());
+    std::cout<<qPrintable(x.data())<<"\n";
     QString xhallo;
     xhallo="1";
     x=xhallo;
-
-    x.Write2Xml(xhallo);
-
+    std::cout<<qPrintable(x.giveType());
+//
+//    x.Write2Xml(xhallo);
+//
     x.refresh();
-    std::cout<<qPrintable(x.data());
-    getchar();
+    std::cout<<qPrintable(x.data())<<"\n";
     return 0;
     }
 /****************************************************************************/

@@ -25,6 +25,8 @@
 
 // Defines
 
+
+
 CXmlDataLib::CXmlDataLib(QString objName)
     {
     readObjName = objName;
@@ -46,27 +48,47 @@ QString CXmlDataLib::data()
 
 bool CXmlDataLib::refresh()
     {
-    if(!readData(readObjName,objData))
+    readDataReturn internValues;
+    if(!readData(readObjName,internValues))
 	{
 	std::cout<<"failed to refresh data!";
+	return false;
 	}
+    objData=internValues.value;
+    objType=internValues.type;
     return true;
     }
 
-QString CXmlDataLib::giveType()
+QString CXmlDataLib::giveType(bool forceRefresh)
     {
-    std::cout<<"This method is not available!";
-    return false;
+    if(forceRefresh)
+	{
+	refresh();
+	}
+    return objType;
     }
 
 CXmlDataLib CXmlDataLib::operator = (QString iData)
 {
-    std::cout << "test\n";
+    readDataReturn input;
+    input.type="NULL";
+    input.value=iData;
+    if (!writeData (readObjName, input))
+    {
+        std::cout << "Failed to write data!";
+    }
+    return *this;
+}
+
+CXmlDataLib CXmlDataLib::operator = (readDataReturn iData)
+{
     if (!writeData (readObjName, iData))
     {
         std::cout << "Failed to write data!";
     }
+    return *this;
 }
+
 
 
 /**************************************************************************************/
@@ -81,7 +103,7 @@ CXmlHandler::~CXmlHandler()
 
     }
 
-bool CXmlHandler::readData(QString objName,QString& output)
+bool CXmlHandler::readData(QString objName,readDataReturn& output)
     {
     bool bFound = false;
     if(objName.isEmpty())
@@ -123,7 +145,11 @@ bool CXmlHandler::readData(QString objName,QString& output)
 		{
 		if (Elements.hasAttribute("value"))
 		    {
-		    output=Elements.attribute("value", "30");
+		    output.value=Elements.attribute("value", "NULL");
+		    if(Elements.hasAttribute("type"))
+			{
+			output.type=Elements.attribute("type","NULL");
+			}
 		    bFound=true;
 		    }
 		else
@@ -147,11 +173,11 @@ bool CXmlHandler::readData(QString objName,QString& output)
     return true;
     }
 
-bool CXmlHandler::writeData(QString objName,QString input)
+bool CXmlHandler::writeData(QString objName,readDataReturn input)
     {
 
     bool bFound = false;
-    if(objName.isEmpty() || input.isEmpty())
+    if(objName.isEmpty() || input.value.isEmpty())
 	{
 	std::cout<<"***********ERROR*********\n";
 	std::cout<<"objName is empty, please check objName\n";
@@ -195,7 +221,11 @@ bool CXmlHandler::writeData(QString objName,QString input)
 		{
 		if (Elements.hasAttribute("value"))
 		    {
-		    Elements.setAttribute("value", input);
+		    Elements.setAttribute("value", input.value);
+		    if(input.type!="NULL")
+			{
+			Elements.setAttribute("type", input.type);
+			}
 		    std::cout << qPrintable(objectDoc.toString());
 		    xmlData.open(QIODevice::ReadWrite|QIODevice::Truncate);
 		    QTextStream out(&xmlData);
@@ -223,13 +253,3 @@ bool CXmlHandler::writeData(QString objName,QString input)
     }
 
 /**************************************************************************************/
-
-void CXmlDataLib::Write2Xml(QString iData)
-{
-    std::cout << "test\n";
-    if (!writeData (readObjName, iData))
-    {
-        std::cout << "Failed to write data!";
-    }
-}
-
