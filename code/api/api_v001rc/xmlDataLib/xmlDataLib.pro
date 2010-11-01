@@ -4,12 +4,13 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	include/data_defines.h\
-		    include/xmldatalib.h
+HEADERS +=  include/data_defines.h\
+            include/xmldatalib.h
 
 ############################# Source Files ##################################
 
-SOURCES += 	src/main.cpp
+SOURCES +=  src/main.cpp \
+            src/xmldatalib.cpp
 
 ############################# Resource Files ##################################
 

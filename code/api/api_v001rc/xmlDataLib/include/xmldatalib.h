@@ -19,7 +19,7 @@ typedef struct __READ_DATA_RETURN__
 
 /**
  * @brief CXmlHandler is the private "under the hood" access class to our XML Files
- * This class should not for standalone usage. Please use CXmlDataLib to access the Data
+ * This class is not designed for standalone using. Please use CXmlDataLib to access the Data
  *@author marco
  *@date 26.10.2010
  */
@@ -36,7 +36,8 @@ public:
     ~CXmlHandler();
 
     /**
-     *The method readData accesses the XML Data, and returns it to you
+     *The method readData accesses the XML Data, and returns it to you.
+     *See xml2header documentation and the example file in xml2header
      *@param objName - objName stands here for the to accessing object
      *@param output - The Value, which is now actual in this object
      *@return true if it worked, false if not. If false see log
@@ -102,7 +103,7 @@ public:
 
     /**
      * For special purposes you might want to know the Type of the data you read. With the Method "giveType" this is possible
-     * @warning At this time this method is not implemented or usable.
+     * @param bool foreRefresh - if true, it refreshes the complete data (internally it calls only the refresh method)
      * @return Type of the initialized objectname
      */
     QString giveType(bool forceRefresh=false);
