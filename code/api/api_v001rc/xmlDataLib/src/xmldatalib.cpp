@@ -184,7 +184,6 @@ bool CXmlHandler::writeData(QString objName,readDataReturn input)
 	return false;
 	}
 
-    std::cout<<"bla\n";
     QFile xmlData("objects.xml");
     xmlData.open(QIODevice::ReadOnly);
     QDomDocument objectDoc("objectType");
@@ -207,14 +206,10 @@ bool CXmlHandler::writeData(QString objName,readDataReturn input)
 	}
 
     QDomElement mainRoot = objectDoc.documentElement();
-    std::cout<<qPrintable(mainRoot.tagName())<<"\n";
     QDomElement hierarchyRoot = mainRoot.firstChildElement();
-    std::cout<<qPrintable(hierarchyRoot.tagName())<<"\n";
     while (!hierarchyRoot.isNull() && !bFound)
 	{
 	QDomElement Elements = hierarchyRoot.firstChildElement();
-	std::cout<<qPrintable(Elements.tagName())<<"\n";
-	std::cout<<qPrintable(objName)<<"\n";
 	while(!Elements.isNull() && !bFound)
 	    {
 	    if(Elements.tagName() == objName)
@@ -226,7 +221,6 @@ bool CXmlHandler::writeData(QString objName,readDataReturn input)
 			{
 			Elements.setAttribute("type", input.type);
 			}
-		    std::cout << qPrintable(objectDoc.toString());
 		    xmlData.open(QIODevice::ReadWrite|QIODevice::Truncate);
 		    QTextStream out(&xmlData);
 		    out << objectDoc.toString();
