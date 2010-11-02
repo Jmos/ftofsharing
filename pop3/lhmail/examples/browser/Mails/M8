@@ -1,0 +1,313 @@
+From: =?iso-8859-2?q?Pawe=B3=20Marciniak?= <pawel@software.com.pl>
+Organization: Software Wydawnictwo sp z o.o.
+To: test@software.com.pl
+Subject: Fwd: test
+Date: Tue, 8 Feb 2005 16:19:49 +0100
+User-Agent: KMail/1.5.4
+MIME-Version: 1.0
+X-KMail-Link-Message: 139479980
+X-KMail-Link-Type: forward
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_ViNCCmiRv6xz+DQ"
+Message-Id: <200502081619.49724.pawel@software.com.pl>
+Status: RO
+X-Status: S
+X-KMail-EncryptionState:  
+X-KMail-SignatureState:  
+
+
+--Boundary-00=_ViNCCmiRv6xz+DQ
+Content-Type: text/plain;
+  charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+
+=2D-=20
+=2D---------------------------------------
+Pawe=B3 Marciniak
+pawel@software.com.pl
+
+--Boundary-00=_ViNCCmiRv6xz+DQ
+Content-Type: message/rfc822;
+  name="forwarded message"
+Content-Transfer-Encoding: 7bit
+Content-Description: pawel@software.com.pl: test
+
+Return-Path: <pawel@software.com.pl>
+Delivered-To: pawel@software.com.pl
+Received: (qmail 32086 invoked by uid 517); 8 Feb 2005 13:45:42 -0000
+Received: from pawel@software.com.pl by poczta.software.com.pl by uid 502 with qmail-scanner-1.22 
+ (clamdscan: 0.71. spamassassin: 2.63.  Clear:RC:1(10.10.11.8):. 
+ Processed in 1.912514 secs); 08 Feb 2005 13:45:42 -0000
+Received: from www.lpmagazine.org (HELO there) (10.10.11.8)
+  by poczta.software.com.pl with SMTP; 8 Feb 2005 13:45:40 -0000
+Cc: 
+Content-Transfer-Encoding: quoted-printable
+Content-Type: Multipart/Mixed;
+  boundary="Boundary--1957747793"
+Date: Tue, 08 Feb 2005 14:38:17 +100
+From: pawel@software.com.pl
+MIME-Version: 1.0
+Subject: test
+To: pawel@software.com.pl
+X-Qmail-Scanner-Message-ID: <110787034267231913@poczta.software.com.pl>
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.91.0
+Status: R 
+X-Status: N
+X-KMail-EncryptionState:  
+X-KMail-SignatureState:  
+
+--Boundary--1957747793
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="ISO-8859-2" 
+
+test
+
+--Boundary--1957747793
+Content-Disposition: attachment; filename="composer.cpp" 
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/x-c++src; charset="ISO-8859-2" 
+
+/****************************************************************************
+**
+** Copyright (C) 2004 LeftHand sp.z.o.o.  All rights reserved.
+**
+*****************************************************************************/
+
+
+#include "composer.h"
+#include "lhsmtp.h"
+#include "lhmail.h"
+#include "lhmailaddr.h"
+#include "lhmime.h"
+
+#include <iostream>
+
+#include <qlineedit.h>
+#include <qmultilineedit.h>
+#include <qpushbutton.h>
+#include <qlabel.h>
+#include <qlayout.h>
+#include <qstring.h>
+#include <qmessagebox.h>
+#include <qlistview.h>
+#include <qfiledialog.h>
+#include <qfile.h>
+
+Composer::Composer( QWidget *parent )
+: QWidget( parent )
+{
+=09QGridLayout * layout =3D new QGridLayout( this, 1, 1, 6 );
+
+=09layout->addWidget( new QLabel( tr( "SMTP:" ), this ), 0, 0 );
+=09smtp_server =3D new QLineEdit( this );
+=09//smtp_server->setText("10.10.11.7");_
+=09smtp_server->setText("127.0.0.1");
+=09layout->addWidget( smtp_server, 0, 1 );
+
+=09layout->addWidget( new QLabel( tr( "From:" ), this ), 1, 0 );
+=09from =3D new QLineEdit( this );
+=09from->setText("pawel@software.com.pl");
+=09layout->addWidget( from, 1, 1 );
+
+=09layout->addWidget( new QLabel( tr( "To:" ), this ), 2, 0 );
+=09to =3D new QLineEdit( this );
+=09//to->setText("pawel@software.com.pl, pawel@lefthand.com.pl");
+=09to->setText("pawel@software.com.pl");
+=09layout->addWidget( to, 2, 1 );
+
+=09layout->addWidget( new QLabel( tr( "Cc:" ), this ), 3, 0 );
+=09cc =3D new QLineEdit( this );
+=09//cc->setText("pawel@software.com.pl");
+=09cc->setText("");
+=09layout->addWidget( cc, 3, 1 );
+
+=09layout->addWidget( new QLabel( tr( "Bcc:" ), this ), 4, 0 );
+=09bcc =3D new QLineEdit( this );
+=09//bcc->setText("pawel@software.com.pl");
+=09bcc->setText("");
+=09layout->addWidget( bcc, 4, 1 );
+
+=09layout->addWidget( new QLabel( tr( "Encoding" ), this ), 5, 0 );
+=09enc =3D new QLineEdit( this );
+=09//bcc->setText("pawel@software.com.pl");
+=09enc->setText("ISO-8859-2");
+=09layout->addWidget( enc, 5, 1 );
+
+=09layout->addWidget( new QLabel( tr( "Subject:" ), this ), 6, 0 );
+=09subject =3D new QLineEdit( this );
+=09//subject->setText("test");
+=09subject->setText(tr("test"));
+=09layout->addWidget( subject, 6, 1 );
+
+=09message =3D new QMultiLineEdit( this );
+=09message->setText("test");
+=09layout->addMultiCellWidget( message, 7, 7, 0, 1 );
+
+=09attach =3D new QPushButton( tr( "&Attach" ), this );
+=09layout->addWidget( attach, 8, 0 );
+=09connect( attach, SIGNAL( clicked() ), this, SLOT( attachFile() ) );
+=09
+=09files =3D new QListView( this );
+=09files->addColumn(tr("Attached Files"));
+=09layout->addWidget( files, 8, 1 );
+=09
+=09send =3D new QPushButton( tr( "S&end" ), this );
+=09layout->addWidget( send, 9, 0 );
+=09connect( send, SIGNAL( clicked() ), this, SLOT( sendMessage() ) );
+=09
+=09save =3D new QPushButton( tr( "&Save" ), this );
+=09layout->addWidget( save, 9, 1 );
+=09connect( save, SIGNAL( clicked() ), this, SLOT( saveMessage() ) );
+
+=09sendStatus =3D new QLabel( this );
+=09layout->addMultiCellWidget( sendStatus, 10, 10, 0, 1 );
+
+=09LHMail::initMailSystem();
+=09
+=09smtp =3D 0;
+}
+
+
+void Composer::attachFile()
+{
+=09QString new_file =3D QFileDialog::getOpenFileName(
+                    ".",
+                    "*",
+                    this,
+                    tr("Attach file dialog") +
+                    tr("Choose a file to attach"));
+=09
+=09std::cout<< new_file <<"\n";
+=09
+=09QListViewItem* element =3D new QListViewItem(files, new_file);
+}
+
+LHMail* Composer::createMessage()
+{
+=09LHMail *mail =3D 0;=09
+=09
+=09if (!testAddresses(to->text(), tr("To"))) return 0;
+=09if (!testAddresses(cc->text(), tr("CC"))) return 0;
+=09if (!testAddresses(bcc->text(), tr("BCC"))) return 0;
+=09
+=09mail =3D new LHMail(from->text(),_
+=09=09=09=09=09  to->text(),
+=09=09=09=09=09  subject->text(),_
+=09=09=09=09=09  message->text(),
+=09=09=09=09=09  0, // do not delete
+=09=09=09=09=09  cc->text(),
+=09=09=09=09=09  bcc->text());
+=09
+=09mail->setEncoding(enc->text());
+=09
+=09//Attaching files
+=09QListViewItem* element =3D files->firstChild();
+=09
+=09while(element !=3D NULL)
+=09{
+=09=09qDebug("Attaching %s", element->text(0).latin1());
+=09=09mail->attachFile(element->text(0), LHMP_CONVERT_CRLF);
+=09=09element =3D element->nextSibling();
+=09}
+=09
+=09return mail;
+}
+
+void Composer::sendMessage()
+{
+=09sendStatus->setText( tr( "Looking up mail servers" ) );
+
+=09if (!smtp)
+=09{
+=09=09smtp =3D new LHSmtp( smtp_server->text());
+=09=09//connect( smtp, SIGNAL(destroyed()), this, SLOT(enableSend()) );
+=09=09connect( smtp, SIGNAL(status(const QString &)),_
+=09=09=09=09 sendStatus, SLOT(setText(const QString &)) );
+=09=09connect( smtp, SIGNAL(sentMail(LHMail*)),_
+=09=09=09=09 this, SLOT(sentMail(LHMail*)) );
+=09}
+
+=09LHMail *mail =3D createMessage();
+=09
+=09if (!mail)
+=09{
+=09=09return;
+=09}
+=09
+=09smtp->send(mail);
+=09
+=09return;
+}
+
+void Composer::saveMessage()
+{
+=09LHMail *mail =3D createMessage();
+=09if (mail =3D=3D NULL)
+=09{
+=09=09qWarning("Composer::saveMessage, mail is NULL");
+=09=09return;
+=09};
+=09
+=09QFile f("MAIL_TMP");
+=09if ( !f.open(IO_WriteOnly) )
+=09{
+=09=09qWarning("Could not open file: %s", (const char*) f.name());
+=09=09return;
+=09}
+=09
+=09QCString data =3D mail->getSendData();
+=09//qDebug("data: %s", (const char*) data);
+=09f.writeBlock((const char*)data, data.length());
+=09f.close();
+=09
+=09QMessageBox::information(this, tr("Mail saved"), tr("Mail data was saved in file: %1").arg(f.name()));
+=09
+=09mail->deleteLater();
+}
+
+int Composer::testAddresses(const QString& addr, const QString& section)
+{
+=09QString wrong;
+=09int invalid =3D LHMailAddr::testMulti(wrong, addr);
+=09int send =3D 1;
+=09if (invalid !=3D 0)
+=09{
+=09=09send =3D !QMessageBox::question(
+=09=09=09=09=09=09=09 this,
+=09=09=09=09=09=09=09 tr("Wrong mail address, send anyway?"),
+=09=09=09=09=09=09=09 tr("In %1 section is wrong %2 addresses: %3 "
+=09=09=09=09=09=09=09=09"Do you want to send mail anyway?")
+=09=09=09=09=09=09=09 .arg(section).arg(invalid).arg(wrong),
+=09=09=09=09=09=09=09 tr("&Yes"), tr("&No"),
+=09=09=09=09=09=09=09 QString::null, 0, 1 );
+=09}
+=09return send;
+}
+=09
+Composer::~Composer()
+{
+=09if (smtp)
+=09{
+=09=09smtp->deleteLater();
+=09}
+}
+
+void Composer::enableSend()
+{
+=09send->setEnabled( TRUE );
+}
+
+void Composer::sentMail(LHMail* mail)
+{
+=09qDebug("mail sent");
+=09mail->deleteLater();
+}
+
+
+--Boundary--1957747793--
+
+
+--Boundary-00=_ViNCCmiRv6xz+DQ--
