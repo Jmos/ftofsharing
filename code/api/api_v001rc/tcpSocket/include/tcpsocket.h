@@ -35,17 +35,13 @@ class CTcpSocket : public QObject
 
   CTcpSocket();
 
-  bool    ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 30000);
-  bool    ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 30000);
+  bool    ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 10000);
+  bool    ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 10000);
   void    Disconnect();
   bool    IsConnected();
   bool    SendText(QString iData);
-  bool    WaitForReceiveText();
-  bool    WaitForReceiveText(int iTimeOutMs);
-  QString ReceiveText();
-  bool    ReceiveLines(QList<QString> &oStringList);
-  QString WaitAndReceiveText();
-  QString WaitAndReceiveText(int iTimeOutMs);
+  bool    ReceiveLines(QList<QString> &oStringList, int iTimeOutMs = 5000);
+  QString ReceiveText(int iTimeOutMs = 5000);
 
  private slots:
 

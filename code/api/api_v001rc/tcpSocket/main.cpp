@@ -27,11 +27,21 @@ int main (int argc, char** argv)
 {
  CPop3Client pop;
 
- pop.GetMail(1 ,"", "", "");
+ REMail *mail;
+
+ mail= pop.GetMail(1 ,"popserver", "username", "password");
+
+ if (mail != NULL)
+ {
+  cout << "\n\nTo: " << qPrintable(mail->To);
+  cout << "\nFrom: " << qPrintable(mail->From);
+  cout << "\nSubject: " << qPrintable(mail->Subject) << "\n\nBody:\n\n";
+
+  for (int Index= 0; Index < mail->Body.size(); Index++)
+      cout << qPrintable(mail->Body.at(Index)) << endl;
+ }
 
  cout << "\n\nErrorCode: " << pop.GetLastErrorCode() << endl;
-
-
 
  getchar();
 

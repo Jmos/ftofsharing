@@ -52,23 +52,17 @@ EErrorCode CPop3Client::GetLastErrorCode()
 
 int CPop3Client::GetMailCount()
 {
- return GetMailCount(cHostName, cUserName, cPassWord, true);
+ return GetMailCount(cHostName, cUserName, cPassWord);
 }
 //-----------------------------------------------------------------
 
 int CPop3Client::GetMailCount(QString iUserName, QString iPassWord)
 {
- return GetMailCount(cHostName, iUserName, iPassWord, true);
+ return GetMailCount(cHostName, iUserName, iPassWord);
 }
 //-----------------------------------------------------------------
 
 int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPassWord)
-{
- return GetMailCount(iHostName, iUserName, iPassWord, true);
-}
-//-----------------------------------------------------------------
-
-int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPassWord, bool iDisconnect)
 {
  QString RxBuffer;
  bool    CorrectConversion;
@@ -86,14 +80,17 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
      return -1;
     }
 
- RxBuffer= cTcpSocket.WaitAndReceiveText(cMaxServerTimeOut);
+ RxBuffer= cTcpSocket.ReceiveText(cMaxServerTimeOut);
 
- if (iDisconnect)
-    cTcpSocket.Disconnect();
+ cTcpSocket.Disconnect();
 
  if (RxBuffer.isEmpty())
     {
-     cLastError= NORESPONSEFROMSERVER;
+     if (cTcpSocket.IsConnected())
+        cLastError= NORESPONSEFROMSERVER;
+     else
+        cLastError= LOSTCONNECTION;
+
      return -1;
     }
 
@@ -129,13 +126,12 @@ REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserNam
 {
  REMail *Mail = new REMail();
  QList<QString> RxBuffer;
- //QString RxBuffer;
- int MailCount;
+ int            MailCount;
 
  if (!CheckParams(iHostName, iUserName, iPassWord))
     return NULL;
 
- MailCount= GetMailCount(iHostName, iUserName, iPassWord, true);
+ MailCount= GetMailCount(iHostName, iUserName, iPassWord);
 
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
     return NULL;
@@ -163,18 +159,25 @@ REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserNam
      cLastError= SENDINGERROR;
      return false;
     }
- if (!cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
+
+ if (!cTcpSocket.ReceiveLines(RxBuffer, cMaxServerTimeOut))
     {
-     cLastError= NORESPONSEFROMSERVER;
+     cLastError= UNKNOWNSERVERERROR;
      return false;
     }
 
- cTcpSocket.ReceiveLines(RxBuffer);
+ if (!RxBuffer.at(0).contains("+OK"))
+    {
+     cLastError= UNKNOWNSERVERERROR;
+     return false;
+    }
 
- //cTcpSocket.ReceiveText();
+ ParseMailHeader(RxBuffer.at(1), Mail);
 
-  //std::cout << RxBuffer.size();
-  //std::cout << qPrintable(RxBuffer);
+ for (int Index= 2; Index < RxBuffer.size(); Index++)
+   {
+    Mail->Body.append(RxBuffer.at(Index));
+   }
 
  return Mail;
 }
@@ -196,50 +199,33 @@ bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPas
 {
  if (cTcpSocket.ConnectTo(iHostName, 110, cMaxServerTimeOut))
     {
-     if (cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
+     if (!cTcpSocket.ReceiveText().contains("+OK"))
         {
-         if (!cTcpSocket.ReceiveText().contains("+OK"))
-            {
-             cLastError= UNKNOWNSERVERERROR;
-             return false;
-            }
-         if (!cTcpSocket.SendText("USER " + iUserName + "\n\r"))
-            {
-             cLastError= SENDINGERROR;
-             return false;
-            }
-         if (!cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
-            {
-             cLastError= NORESPONSEFROMSERVER;
-             return false;
-            }
-         if (!cTcpSocket.ReceiveText().contains("+OK"))
-            {
-             cLastError= UNKNOWNSERVERERROR;
-             return false;
-            }
-         if (!cTcpSocket.SendText("PASS " + iPassWord + "\n\r"))
-            {
-             cLastError= SENDINGERROR;
-             return false;
-            }
-         if (!cTcpSocket.WaitForReceiveText(cMaxServerTimeOut))
-            {
-             cLastError= NORESPONSEFROMSERVER;
-             return false;
-            }
-         if (!cTcpSocket.ReceiveText().contains("+OK"))
-            {
-             cLastError= UNKNOWNSERVERERROR;
-             return false;
-            }
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
+     if (!cTcpSocket.SendText("USER " + iUserName + "\n\r"))
+        {
+         cLastError= SENDINGERROR;
+         return false;
+        }
+     if (!cTcpSocket.ReceiveText().contains("+OK"))
+        {
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
+     if (!cTcpSocket.SendText("PASS " + iPassWord + "\n\r"))
+        {
+         cLastError= SENDINGERROR;
+         return false;
+        }
+     if (!cTcpSocket.ReceiveText().contains("+OK"))
+        {
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
 
-         return true;
-        }
-        else
-        {
-         cLastError= NORESPONSEFROMSERVER;
-        }
+      return true;
     }
     else
     {
@@ -271,5 +257,48 @@ if (iPassWord.isEmpty())
  return true;
 }
 //-----------------------------------------------------------------
+
+void CPop3Client::ParseMailHeader(QString iMailHeader, REMail *oMail)
+{
+ QString TempBuffer= iMailHeader;
+ QString Temp;
+ int     CharIndex;
+
+ for (int Index= 0; Index < 3; Index++)
+ {
+  switch(Index)
+  {
+  case 0:  Temp= "To: ";       break;
+  case 1:  Temp= "From: ";     break;
+  case 2:  Temp= "Subject: ";  break;
+  }
+
+  if ((CharIndex= TempBuffer.indexOf(Temp)) != -1)
+  {
+   TempBuffer= TempBuffer.remove(0, CharIndex + Temp.length());
+
+   if ((CharIndex= TempBuffer.indexOf("\n")) != -1)
+      {
+       TempBuffer= TempBuffer.remove(CharIndex, TempBuffer.length());
+       switch(Index)
+       {
+        case 0:  oMail->To= TempBuffer;       break;
+        case 1:  oMail->From= TempBuffer;     break;
+        case 2:  oMail->Subject= TempBuffer;  break;
+       }
+      }
+  }
+
+  TempBuffer= iMailHeader;
+ }
+
+ /*//Debug
+ std::cout << "\n\nTo: " << qPrintable(oMail->To);
+ std::cout << "\nFrom: " << qPrintable(oMail->From);
+ std::cout << "\nSubject: " << qPrintable(oMail->Subject);
+ */
+}
+//-----------------------------------------------------------------
+
 
 

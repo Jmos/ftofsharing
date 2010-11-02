@@ -13,7 +13,7 @@ CTcpSocket::CTcpSocket()
 {
  cConnected= false;
 
- cSocketStream= new QTextStream(&cTcpSocket);
+ cTcpSocket.setSocketOption(QAbstractSocket::KeepAliveOption, false);
 
  connect(&cTcpSocket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
  connect(&cTcpSocket, SIGNAL(connected()), this, SLOT(Connected()));
@@ -83,89 +83,59 @@ bool CTcpSocket::SendText(QString iData)
  return false;
 }
 //-----------------------------------------------------------------
-bool CTcpSocket::WaitForReceiveText()
-{
- if (!cConnected)
-    return false;
 
- if (cTcpSocket.bytesAvailable() > 0)
-    return true;
-
- return cTcpSocket.waitForReadyRead();
-}
-//-----------------------------------------------------------------
-
-bool CTcpSocket::WaitForReceiveText(int iTimeOutMs)
-{
- if (!cConnected)
-    return false;
-
- if (cTcpSocket.bytesAvailable() > 0)
-    return true;
-
- return cTcpSocket.waitForReadyRead(iTimeOutMs);
-}
-//-----------------------------------------------------------------
-
-QString CTcpSocket::ReceiveText()
+QString CTcpSocket::ReceiveText(int iTimeOutMs)
 {
  if (!cConnected)
     return "";
 
- if (cTcpSocket.bytesAvailable() == 0)
-    return "";
+ QString RxData;
 
- //std::cout << "Bytes: " << cTcpSocket.bytesAvailable() << std::endl;
+ if (cTcpSocket.waitForReadyRead(iTimeOutMs))
+    {
+     int CharIndex;
 
- QByteArray RxBuffer(cTcpSocket.bytesAvailable(), 0);
+     RxData= cTcpSocket.readAll();
 
- RxBuffer= cTcpSocket.read(RxBuffer.size());
+     CharIndex= RxData.indexOf("\n");
 
- QString RxData(RxBuffer);
+     if (CharIndex != -1)
+        RxData= RxData.left(CharIndex);
+    }
 
  return RxData;
 }
 //-----------------------------------------------------------------
 
-bool CTcpSocket::ReceiveLines(QList<QString> &oStringList)
+bool CTcpSocket::ReceiveLines(QList<QString> &oStringList, int iTimeOutMs)
 {
  if (!cConnected)
     return false;
 
- if (cTcpSocket.bytesAvailable() == 0)
-    return false;
-
  QString RxData;
+ int     CharIndex;
+ bool    RetrunValue= false;
 
- //std::cout << "Bytes: " << cTcpSocket.bytesAvailable() << std::endl;
-
- while (cTcpSocket.bytesAvailable() > 0)
+ while (cTcpSocket.waitForReadyRead(iTimeOutMs))
  {
-  oStringList.append(cTcpSocket.readLine());
+  RxData= cTcpSocket.readAll();
+
+  RetrunValue= true;
+
+  CharIndex= RxData.indexOf("\n.\r\n");
+
+  if (CharIndex != -1)
+     RxData= RxData.left(CharIndex);
+
+ oStringList.append(RxData);
+
+ if (CharIndex != -1)
+     break;
  }
 
- return true;
+ return RetrunValue;
 }
 //-----------------------------------------------------------------
-
-QString CTcpSocket::WaitAndReceiveText()
-{
- if (!WaitForReceiveText())
-    return "";
-
- return ReceiveText();
-}
-//-----------------------------------------------------------------
-
-QString CTcpSocket::WaitAndReceiveText(int iTimeOutMs)
-{
- if (!WaitForReceiveText(iTimeOutMs))
-    return "";
-
- return ReceiveText();
-}
-//-----------------------------------------------------------------
-
 
 
 

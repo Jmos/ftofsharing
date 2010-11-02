@@ -22,7 +22,8 @@ enum EErrorCode
     UNKNOWNSERVERERROR,
     SENDINGERROR,
     EMPTYMAILBOX,
-    MAILINDEXOUTOUBOUNDS
+    MAILINDEXOUTOUBOUNDS,
+    LOSTCONNECTION
 };
 //-----------------------------------------------------------------
 
@@ -62,7 +63,7 @@ class CPop3Client
   void Initialise();
   bool ServerLogIn(QString iHostName, QString iUserName, QString iPassWord);
   bool CheckParams(QString iHostName, QString iUserName, QString iPassWord);
-  int  GetMailCount(QString iHostName, QString iUserName, QString iPassWord, bool iDisconnect);
+  void ParseMailHeader(QString iMailHeader, REMail *oMail);
 
  public:
 

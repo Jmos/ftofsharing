@@ -30,7 +30,7 @@ DEPENDPATH += ;$$INCLUDEPATH
 
 ############################# QT Libraries ##################################
 
-QT += core xml xmlpatterns network
+QT += core xml xmlpatterns network gui
 
 ########################## Configuration Options ############################
 
@@ -39,7 +39,8 @@ CONFIG +=   warn_on \
             silent \
             resources \
             console \
-            release
+            release \
+            thread  \
 
 ###################### Intermediate Output Directories ######################
 
