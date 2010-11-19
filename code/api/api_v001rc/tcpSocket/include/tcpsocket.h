@@ -4,10 +4,12 @@
 //-----------------------------------------------------------------
 
 #include <QTcpSocket>
+#include <QSslSocket>
 #include <QString>
 #include <QObject>
 #include <QHostAddress>
 #include <iostream>
+
 //-----------------------------------------------------------------
 
 /**
@@ -28,6 +30,7 @@ class CTcpSocket : public QObject
  Q_OBJECT
 
   QTcpSocket   cTcpSocket;
+  QSslSocket   cSslSocket;
   bool         cConnected;
   QTextStream *cSocketStream;
 
@@ -40,6 +43,7 @@ class CTcpSocket : public QObject
   void    Disconnect();
   bool    IsConnected();
   bool    SendText(QString iData);
+  bool    SendText(QList<QString> iData);
   bool    ReceiveLines(QList<QString> &oStringList, int iTimeOutMs = 5000);
   QString ReceiveText(int iTimeOutMs = 5000);
 

@@ -5,13 +5,17 @@ TEMPLATE = app
 ############################# Header Files ##################################
 
 HEADERS += ./include/tcpsocket.h \
-           ./include/pop3client.h \ 
+           ./include/pop3client.h \
+           ./include/smtpclient.h \ 
+           ./include/mailclient.h \ 
 
 ############################# Source Files ##################################
 
 SOURCES +=  ./main.cpp \
             ./src/tcpsocket.cpp \
             ./src/pop3client.cpp \
+            ./src/smtpclient.cpp \
+            ./src/mailclient.cpp \
             
 
 ############################# IncludePath  ##################################
@@ -41,6 +45,7 @@ CONFIG +=   warn_on \
             console \
             release \
             thread  \
+            SSL
 
 ###################### Intermediate Output Directories ######################
 

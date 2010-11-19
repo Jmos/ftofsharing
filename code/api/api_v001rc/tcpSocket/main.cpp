@@ -18,6 +18,7 @@
 #include <QObject>
 
 #include "pop3client.h"
+#include "smtpclient.h"
 
 
 using namespace std;
@@ -25,11 +26,31 @@ using namespace std;
 
 int main (int argc, char** argv)
 {
+
+ CSmtpClient smtp;
+
+ REMail mail;
+
+ mail.To= "georg1990@hotmail.com";
+ mail.From= "h.saxl@tele.at";
+ mail.Subject= "Testmail";
+ mail.Body.append("Hallo,");
+ mail.Body.append("Das ist eine Testmail.");
+ mail.Body.append("Test");
+ mail.Body.append("blablabla");
+
+ smtp.SetServerPort(587);
+ smtp.SendMail(&mail, "mailserver", "username", "password");
+
+
+ cout << "\n\nErrorCode: " << smtp.GetLastErrorCode() << endl;
+
+ /*
  CPop3Client pop;
 
  REMail *mail;
 
- mail= pop.GetMail(1 ,"popserver", "username", "password");
+ mail= pop.GetMail(1 ,"pop.utanet.at", "saxlruth", "coolpix");
 
  if (mail != NULL)
  {
@@ -42,6 +63,7 @@ int main (int argc, char** argv)
  }
 
  cout << "\n\nErrorCode: " << pop.GetLastErrorCode() << endl;
+*/
 
  getchar();
 
