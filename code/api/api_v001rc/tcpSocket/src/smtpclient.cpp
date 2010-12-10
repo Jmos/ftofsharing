@@ -116,6 +116,11 @@ bool CSmtpClient::SendMail(REMail *iMail, QString iHostName, QString iUserName, 
 
  MailData.append("\r\n.\r\n");
 
+ if (cTcpSocket != NULL)
+    delete cTcpSocket;
+
+ cTcpSocket = new CTcpSocket(cConnectionType);
+
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
      return false;
 
@@ -236,16 +241,13 @@ bool CSmtpClient::ServerLogIn(QString iHostName, QString iUserName, QString iPas
          cLastError= SENDINGERROR;
          return false;
         }
-
-     QString s= cTcpSocket->ReceiveText();
-     if (s.left(3) != "235")
+     if (cTcpSocket->ReceiveText().left(3) != "235")
         {
-         printf(qPrintable("Auth3:  " + s));
          cLastError= AUTHENTICATIONERROR;
          return false;
         }
 
-      return true;
+     return true;
     }
     else
     {

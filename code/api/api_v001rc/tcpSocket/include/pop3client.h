@@ -42,6 +42,10 @@ class CPop3Client : public CMailClient
   REMail *GetMail(int iMailIndex);
   REMail *GetMail(int iMailIndex, QString iUserName, QString iPassWord);
   REMail *GetMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord);
+
+  bool DeleteMail(int iMailIndex);
+  bool DeleteMail(int iMailIndex, QString iUserName, QString iPassWord);
+  bool DeleteMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord);
 };
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------

@@ -17,10 +17,11 @@ CTcpSocket::CTcpSocket(EConnectionType iConnectionType, QObject *iParent): QObje
 
  cTcpSocket.setSocketOption(QAbstractSocket::KeepAliveOption, false);
 
- connect(&cTcpSocket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
  connect(&cTcpSocket, SIGNAL(connected()), this, SLOT(Connected()));
+ connect(&cTcpSocket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 
  connect(&cSslSocket, SIGNAL(encrypted()), this, SLOT(EncryptedMode()));
+ connect(&cSslSocket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 }
 
 /**
@@ -30,7 +31,9 @@ CTcpSocket::CTcpSocket(EConnectionType iConnectionType, QObject *iParent): QObje
 void CTcpSocket::Connected()
 {
  if (cConnectionType == NONCRYPTEDMODE)
-    cConnected= true;
+    {
+     cConnected= true;
+    }
 }
 
 /**
@@ -40,7 +43,9 @@ void CTcpSocket::Connected()
 void CTcpSocket::EncryptedMode()
 {
  if (cConnectionType == SSLMODE)
-    cConnected= true;
+    {
+     cConnected= true;
+    }
 }
 
 /**
@@ -108,11 +113,13 @@ void CTcpSocket::Disconnect()
 
  if (cConnectionType == NONCRYPTEDMODE)
     {
-     cTcpSocket.disconnectFromHost();
+     //cTcpSocket.disconnectFromHost();
+     cTcpSocket.close();
     }
     else
        {
-        cSslSocket.disconnectFromHost();
+        //cSslSocket.disconnectFromHost();
+        cSslSocket.close();
        }
 }
 
@@ -242,6 +249,52 @@ QString CTcpSocket::ReceiveText(int iTimeOutMs)
 
  return RxData;
 }
+//---------------------------------------------------------------------------------
+
+bool CTcpSocket::ReceiveText(QString &oRxData, int iTimeOutMs)
+{
+ if (!cConnected)
+    return false;
+
+ oRxData= "";
+
+ if (cConnectionType == NONCRYPTEDMODE)
+    {
+     if (cTcpSocket.waitForReadyRead(iTimeOutMs))
+        {
+         int CharIndex;
+
+         oRxData= cTcpSocket.readAll();
+
+         CharIndex= oRxData.indexOf("\n");
+
+         if (CharIndex != -1)
+            oRxData= oRxData.left(CharIndex);
+        }
+    }
+    else
+       {
+        if (cSslSocket.waitForReadyRead(-1))
+           {
+            int CharIndex;
+
+            oRxData= cSslSocket.readAll();
+
+            CharIndex= oRxData.indexOf("\n");
+
+            if (CharIndex != -1)
+             oRxData= oRxData.left(CharIndex);
+           }
+        else
+        {
+         printf("\n\nTimeout\n\n");
+         return false;
+        }
+
+       }
+
+ return true;
+}
 
 /**
 *  Receives a list of data until the line: [CR][LF].[CR][LF]
@@ -268,7 +321,7 @@ bool CTcpSocket::ReceiveLines(QList<QString> &oStringList, int iTimeOutMs)
 
       RetrunValue= true;
 
-      CharIndex= RxData.indexOf("\n.\r\n");
+      CharIndex= RxData.indexOf("\r\n.\r\n");
 
       if (CharIndex != -1)
          RxData= RxData.left(CharIndex);

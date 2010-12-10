@@ -40,7 +40,7 @@ class CTcpSocket : public QObject
      SSLMODE            ///< SSL-verschlüsselte Tcp-Verbindung
   };
 
-  CTcpSocket(EConnectionType iConnectionType, QObject *iParent= 0);
+  CTcpSocket(EConnectionType iConnectionType= NONCRYPTEDMODE, QObject *iParent= 0);
 
   bool    ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 10000);
   bool    ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 10000);
@@ -50,6 +50,7 @@ class CTcpSocket : public QObject
   bool    SendText(QList<QString> iData);
   bool    ReceiveLines(QList<QString> &oStringList, int iTimeOutMs = 5000);
   QString ReceiveText(int iTimeOutMs = 5000);
+  bool    ReceiveText(QString &oRxData, int iTimeOutMs = 5000);
 
   EConnectionType GetConnectionType();
 

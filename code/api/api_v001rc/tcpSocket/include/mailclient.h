@@ -52,7 +52,6 @@ class CMailClient
       NORESPONSEFROMSERVER,   ///< The host doesnot respond.
       UNKNOWNSERVERERROR,     ///< A unknown error occurred on the server.
       SENDINGERROR,           ///< An error occurred while sending.
-      EMPTYMAILBOX,           ///< The mailbox is empty.
       MAILINDEXOUTOFBOUNDS,   ///< The commited Mailindex is out of bounds.
       LOSTCONNECTION,         ///< An unexpected disconnection occurred.
       AUTHENTICATIONERROR,    ///< Authentication failed.
@@ -98,6 +97,7 @@ class CMailClient
   EProtocolType   cProtocol;
   int             cMaxServerTimeOut;
   int             cServerPort;
+  CTcpSocket::EConnectionType cConnectionType;
 
   void Initialise(EProtocolType iProtocol, CTcpSocket::EConnectionType iConnectionType);
   bool CheckParams(QString iHostName, QString iUserName, QString iPassWord);

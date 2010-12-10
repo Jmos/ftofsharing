@@ -53,7 +53,7 @@ CPop3Client::CPop3Client(QString iHostName, QString iUserName, QString iPassWord
 ********************************************************************************/
 int CPop3Client::GetMailCount()
 {
- return GetMailCount(cHostName, cUserName, cPassWord);
+  return GetMailCount(cHostName, cUserName, cPassWord);
 }
 
 /**
@@ -87,10 +87,15 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
  if (!CheckParams(iHostName, iHostName, iPassWord))
     return -1;
 
+ if (cTcpSocket != NULL)
+    delete cTcpSocket;
+
+ cTcpSocket = new CTcpSocket(cConnectionType);
+
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
     return -1;
 
- if (!cTcpSocket->SendText("STAT\n\r"))
+ if (!cTcpSocket->SendText("STAT\r\n"))
     {
      cLastError= SENDINGERROR;
      return -1;
@@ -127,8 +132,8 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
 
 /**
 *  This function receives a mail with help of a mail-index.\n
-*  This mail-index must be smaller than the current number of mails\n
-*  in your mailbox. First mail you get with mail-index 0.
+*  This mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
 *
 *  @param   iMailIndex Index of the mail you want to receive.
 *  @return  Returns a pointer to the received mail-record on success, on error NULL.
@@ -141,8 +146,8 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex)
 
 /**
 *  This function receives a mail with help of a mail-index.\n
-*  This mail-index must be smaller than the current number of mails\n
-*  in your mailbox. First mail you get with mail-index 0.
+*  This mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
 *
 *  @param   iMailIndex Index of the mail you want to receive.
 *  @param   iUserName Defines the username for authentication.
@@ -157,8 +162,8 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iUserName, QSt
 
 /**
 *  This function receives a mail with help of a mail-index.\n
-*  This mail-index must be smaller than the current number of mails\n
-*  in your mailbox. First mail you get with mail-index 0.
+*  This mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
 *
 *  @param   iMailIndex Index of the mail you want to receive.
 *  @param   iHostName Defines the host to connect to.
@@ -171,12 +176,14 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QSt
 {
  REMail *Mail = new REMail();
  QList<QString> RxBuffer;
- int            MailCount;
 
  if (!CheckParams(iHostName, iUserName, iPassWord))
     return NULL;
 
- MailCount= GetMailCount(iHostName, iUserName, iPassWord);
+ if (cTcpSocket != NULL)
+    delete cTcpSocket;
+
+ cTcpSocket = new CTcpSocket(cConnectionType);
 
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
     return NULL;
@@ -186,20 +193,8 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QSt
      cLastError= MAILINDEXOUTOFBOUNDS;
      return NULL;
     }
- if (MailCount == -1)
-    return NULL;
- if (MailCount == 0)
-    {
-     cLastError= EMPTYMAILBOX;
-     return NULL;
-    }
- if (MailCount < iMailIndex)
-    {
-     cLastError= MAILINDEXOUTOFBOUNDS;
-     return NULL;
-    }
 
- if (!cTcpSocket->SendText("RETR " + QString::number(iMailIndex) + "\n\r"))
+ if (!cTcpSocket->SendText("RETR " + QString::number(iMailIndex) + "\r\n"))
     {
      cLastError= SENDINGERROR;
      return false;
@@ -211,9 +206,11 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QSt
      return false;
     }
 
+ cTcpSocket->Disconnect();
+
  if (!RxBuffer.at(0).contains("+OK"))
     {
-     cLastError= UNKNOWNSERVERERROR;
+     cLastError= MAILINDEXOUTOFBOUNDS;
      return false;
     }
 
@@ -225,6 +222,101 @@ CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QSt
    }
 
  return Mail;
+}
+
+/**
+*  This function deletes a mail by it's mail-index.
+*  The mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
+*  <b>Caution: mail-index "-1" deletes the whole mailbox irrevocably!!!</b>
+*
+*  @param   iMailIndex Index of the mail you want to delete.
+*  @return  Returns \c true when deleted successfully, else \c false.
+*
+********************************************************************************/
+bool CPop3Client::DeleteMail(int iMailIndex)
+{
+ return DeleteMail(iMailIndex, cHostName, cUserName, cPassWord);
+}
+
+/**
+*  This function deletes a mail by it's mail-index.
+*  The mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
+*  <b>Caution: mail-index "-1" deletes the whole mailbox irrevocably!!!</b>
+*
+*  @param   iMailIndex Index of the mail you want to receive.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when deleted successfully, else \c false.
+*
+********************************************************************************/
+bool CPop3Client::DeleteMail(int iMailIndex, QString iUserName, QString iPassWord)
+{
+ return DeleteMail(iMailIndex, cHostName, iUserName, iPassWord);
+}
+
+/**
+*  This function deletes a mail by it's mail-index.
+*  The mail-index must be even or smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index "1".
+*  <b>Caution: mail-index "-1" deletes the whole mailbox irrevocably!!!</b>
+*
+*  @param   iMailIndex Index of the mail you want to receive.
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when deleted successfully, else \c false.
+*
+********************************************************************************/
+bool CPop3Client::DeleteMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord)
+{
+ QString RxBuffer;
+
+ if (!CheckParams(iHostName, iHostName, iPassWord))
+    return false;
+
+ if (iMailIndex == 0 || iMailIndex < -1)
+    {
+     cLastError= MAILINDEXOUTOFBOUNDS;
+     return false;
+    }
+
+ if (cTcpSocket != NULL)
+    delete cTcpSocket;
+
+ cTcpSocket = new CTcpSocket(cConnectionType);
+
+ if (!ServerLogIn(iHostName, iUserName, iPassWord))
+    return false;
+
+ if (!cTcpSocket->SendText("DELE " + QString::number(iMailIndex) + "\r\n"))
+    {
+     cLastError= SENDINGERROR;
+     return false;
+    }
+
+ RxBuffer= cTcpSocket->ReceiveText(cMaxServerTimeOut);
+
+ cTcpSocket->Disconnect();
+
+ if (RxBuffer.isEmpty())
+    {
+     if (cTcpSocket->IsConnected())
+        cLastError= NORESPONSEFROMSERVER;
+     else
+        cLastError= LOSTCONNECTION;
+
+     return false;
+    }
+
+ if (!RxBuffer.contains("+OK"))
+    {
+     cLastError= MAILINDEXOUTOFBOUNDS;
+     return false;
+    }
+
+ return true;
 }
 
 /**
@@ -290,7 +382,8 @@ bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPas
          cLastError= UNKNOWNSERVERERROR;
          return false;
         }
-     if (!cTcpSocket->SendText("USER " + iUserName + "\n\r"))
+
+     if (!cTcpSocket->SendText("USER " + iUserName + "\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
@@ -300,7 +393,8 @@ bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPas
          cLastError= UNKNOWNSERVERERROR;
          return false;
         }
-     if (!cTcpSocket->SendText("PASS " + iPassWord + "\n\r"))
+
+     if (!cTcpSocket->SendText("PASS " + iPassWord + "\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
@@ -314,9 +408,7 @@ bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPas
       return true;
     }
     else
-    {
-     cLastError= UNAVAILABLEHOST;
-    }
+        cLastError= UNAVAILABLEHOST;
 
  return false;
 }

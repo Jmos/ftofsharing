@@ -54,11 +54,11 @@ CMailClient::CMailClient(EProtocolType iProtocol, CTcpSocket::EConnectionType iC
 ********************************************************************************/
 void CMailClient::Initialise(EProtocolType iProtocol, CTcpSocket::EConnectionType iConnectionType)
 {
- cMaxServerTimeOut=     5000;
+ cMaxServerTimeOut=     10000;
  cLastError=            NOERROR;
  cProtocol=             iProtocol;
-
- cTcpSocket = new CTcpSocket(iConnectionType);
+ cConnectionType=       iConnectionType;
+ cTcpSocket=            NULL;
 
  switch (iProtocol)
  {
@@ -73,7 +73,10 @@ void CMailClient::Initialise(EProtocolType iProtocol, CTcpSocket::EConnectionTyp
 ********************************************************************************/
 CMailClient::~CMailClient()
 {
- delete cTcpSocket;
+ if (cTcpSocket != NULL)
+    delete cTcpSocket;
+
+ cTcpSocket= NULL;
 }
 
 /**
@@ -142,7 +145,7 @@ void CMailClient::SetMaxServerTimeOut(int iMaxServerTimeOut)
 ********************************************************************************/
 CTcpSocket::EConnectionType CMailClient::GetConnectionType()
 {
- return cTcpSocket->GetConnectionType();
+ return cConnectionType;
 }
 
 /**
@@ -154,11 +157,7 @@ CTcpSocket::EConnectionType CMailClient::GetConnectionType()
 ********************************************************************************/
 void CMailClient::SetConnectionType(CTcpSocket::EConnectionType iConnectionType)
 {
- if (iConnectionType != cTcpSocket->GetConnectionType())
-    {
-     delete cTcpSocket;
-     cTcpSocket= new CTcpSocket(iConnectionType);
-    }
+ cConnectionType= iConnectionType;
 }
 
 /**
