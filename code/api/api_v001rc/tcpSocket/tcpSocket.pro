@@ -21,7 +21,7 @@ SOURCES +=  ./main.cpp \
 ############################# IncludePath  ##################################
 
 INCLUDEPATH += ./include \
-               ./src 
+               ./src     \
 
 ############################# Resource Files ################################
 
@@ -34,7 +34,7 @@ DEPENDPATH += ;$$INCLUDEPATH
 
 ############################# QT Libraries ##################################
 
-QT += core xml xmlpatterns network gui
+QT += core xml xmlpatterns network gui 
 
 ########################## Configuration Options ############################
 
@@ -45,7 +45,6 @@ CONFIG +=   warn_on \
             console \
             release \
             thread  \
-            SSL
 
 ###################### Intermediate Output Directories ######################
 

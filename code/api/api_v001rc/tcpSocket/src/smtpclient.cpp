@@ -1,42 +1,87 @@
-//=================================================================
-// Name:          smtpclient.cpp
-// Autor:         Saxl Georg
-// Version:       1.0
-// Datum:         19.11.2010
-// Beschreibung:
-//=================================================================
-
 
 #include "smtpclient.h"
 //-----------------------------------------------------------------
 
-CSmtpClient::CSmtpClient(): CMailClient(ProtocolSMTP)
+
+/**
+*  Constructor of CSmtpClient-Class\n
+*  and Parent-Constructor of CMailClient-Class*
+*
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL)
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CSmtpClient::CSmtpClient(CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolSMTP, iConnectionType)
 {
 }
-//-----------------------------------------------------------------
 
-CSmtpClient::CSmtpClient(QString iHostName): CMailClient(ProtocolSMTP, iHostName)
+/**
+*  Constructor of CSmtpClient-Class\n
+*  and Parent-Constructor of CMailClient-Class*
+*
+*  @param   iHostName Defines the Host to connect to.
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL).
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CSmtpClient::CSmtpClient(QString iHostName, CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolSMTP, iConnectionType, iHostName)
 {
 }
-//-- ---------------------------------------------------------------
 
-CSmtpClient::CSmtpClient(QString iHostName, QString iUserName, QString iPassWord): CMailClient(ProtocolSMTP, iHostName, iUserName, iPassWord)
+/**
+*  Constructor of CSmtpClient-Class\n
+*  and Parent-Constructor of CMailClient-Class*
+*
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL).
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CSmtpClient::CSmtpClient(QString iHostName, QString iUserName, QString iPassWord, CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolSMTP, iConnectionType, iHostName, iUserName, iPassWord)
 {
 }
-//-----------------------------------------------------------------
 
+/**
+*  Function to send an e-mail.
+*
+*  @param   iMail A Pointer to an instance of \c REMail.
+*  @return  Returns \c true when sending was successfully, else \c false.
+*
+********************************************************************************/
 bool CSmtpClient::SendMail(REMail *iMail)
 {
  return SendMail(iMail, cHostName, cUserName, cPassWord);
 }
-//-----------------------------------------------------------------
 
+/**
+*  Function to send an e-mail.
+*
+*  @param   iMail A Pointer to an instance of \c REMail.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when sending was successfully, else \c false.
+*
+********************************************************************************/
 bool CSmtpClient::SendMail(REMail *iMail, QString iUserName, QString iPassWord)
 {
  return SendMail(iMail, cHostName, iUserName, iPassWord);
 }
-//-----------------------------------------------------------------
 
+/**
+*  Function to send an e-mail.
+*
+*  @param   iMail A Pointer to an instance of \c REMail.
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when sending was successfully, else \c false.
+*
+********************************************************************************/
 bool CSmtpClient::SendMail(REMail *iMail, QString iHostName, QString iUserName, QString iPassWord)
 {
  QList<QString> MailData;
@@ -63,10 +108,9 @@ bool CSmtpClient::SendMail(REMail *iMail, QString iHostName, QString iUserName, 
         return false;
        }
 
-
  MailData.append("From: <"   + iMail->From + ">");
  MailData.append("To: <"     + iMail->To   + ">");
- MailData.append("Subject: " + iMail->Subject);
+ MailData.append("Subject: " + iMail->Subject + "\n");
 
  MailData.append(iMail->Body);
 
@@ -75,53 +119,64 @@ bool CSmtpClient::SendMail(REMail *iMail, QString iHostName, QString iUserName, 
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
      return false;
 
- if (!cTcpSocket.SendText("MAIL FROM: <" + iMail->From + ">\r\n"))
+ if (!cTcpSocket->SendText("MAIL FROM: <" + iMail->From + ">\r\n"))
     {
      cLastError= SENDINGERROR;
      return false;
     }
- if (cTcpSocket.ReceiveText().left(3) != "250")
+ if (cTcpSocket->ReceiveText().left(3) != "250")
     {
      cLastError= INVALIDFROMADDRESS;
      return false;
     }
- if (!cTcpSocket.SendText("RCPT TO: <" + iMail->To + ">\r\n"))
+ if (!cTcpSocket->SendText("RCPT TO: <" + iMail->To + ">\r\n"))
     {
      cLastError= SENDINGERROR;
      return false;
     }
- if (cTcpSocket.ReceiveText().left(3) != "250")
+ if (cTcpSocket->ReceiveText().left(3) != "250")
     {
      cLastError= INVALIDTOADDRESS;
      return false;
     }
- if (!cTcpSocket.SendText("DATA\r\n"))
+ if (!cTcpSocket->SendText("DATA\r\n"))
     {
      cLastError= SENDINGERROR;
      return false;
     }
- if (cTcpSocket.ReceiveText().left(3) != "354")
+ if (cTcpSocket->ReceiveText().left(3) != "354")
     {
      cLastError= UNKNOWNSERVERERROR;
      return false;
     }
- if (!cTcpSocket.SendText(MailData))
+ if (!cTcpSocket->SendText(MailData))
     {
      cLastError= SENDINGERROR;
      return false;
     }
- if (cTcpSocket.ReceiveText().left(3) != "250")
+ if (cTcpSocket->ReceiveText().left(3) != "250")
     {
      cLastError= UNKNOWNSERVERERROR;
      return false;
     }
 
- cTcpSocket.Disconnect();
+ cTcpSocket->Disconnect();
 
  return true;
 }
-//-----------------------------------------------------------------
 
+/**
+*  Implementation of abstract class CMailClient.\n
+*  Private function to login at the current host.
+*
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when login was successfully, else \c false.
+*
+*  @see CMailClient, CPop3Client
+*
+********************************************************************************/
 bool CSmtpClient::ServerLogIn(QString iHostName, QString iUserName, QString iPassWord)
 {
  QString    PCName= getenv("COMPUTERNAME");
@@ -131,60 +186,58 @@ bool CSmtpClient::ServerLogIn(QString iHostName, QString iUserName, QString iPas
  UserName.append(iUserName);
  PassWord.append(iPassWord);
 
- printf(qPrintable("Username: " + (QString)UserName.toBase64() + "\nPassword: " + (QString)PassWord.toBase64() + "\n\n"));
-
- if (cTcpSocket.ConnectTo(iHostName, cServerPort, cMaxServerTimeOut))
+ if (cTcpSocket->ConnectTo(iHostName, cServerPort, cMaxServerTimeOut))
     {
-     if (cTcpSocket.ReceiveText().left(3) != "220")
+     if (cTcpSocket->ReceiveText().left(3) != "220")
         {
          cLastError= UNKNOWNSERVERERROR;
          return false;
         }
-     if (!cTcpSocket.SendText("EHLO " + PCName + "\r\n"))
+     if (!cTcpSocket->SendText("EHLO " + PCName + "\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
         }
-     if (cTcpSocket.ReceiveText().left(3) != "250")
+     if (cTcpSocket->ReceiveText().left(3) != "250")
         {
-         if (!cTcpSocket.SendText("HELO " + PCName + "\r\n"))
+         if (!cTcpSocket->SendText("HELO " + PCName + "\r\n"))
             {
              cLastError= SENDINGERROR;
              return false;
             }
-         if (cTcpSocket.ReceiveText().left(3) != "250")
+         if (cTcpSocket->ReceiveText().left(3) != "250")
             {
              cLastError= UNKNOWNSERVERERROR;
              return false;
             }
         }
-     if (!cTcpSocket.SendText("AUTH LOGIN\r\n"))
+     if (!cTcpSocket->SendText("AUTH LOGIN\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
         }
-     if (cTcpSocket.ReceiveText().left(3) != "334")
+     if (cTcpSocket->ReceiveText().left(3) != "334")
         {
          cLastError= AUTHENTICATIONERROR;
          return false;
         }
-     if (!cTcpSocket.SendText((QString)UserName.toBase64() + "\r\n"))
+     if (!cTcpSocket->SendText((QString)UserName.toBase64() + "\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
         }
-     if (cTcpSocket.ReceiveText().left(3) != "334")
+     if (cTcpSocket->ReceiveText().left(3) != "334")
         {
          cLastError= AUTHENTICATIONERROR;
          return false;
         }
-     if (!cTcpSocket.SendText((QString)PassWord.toBase64() + "\r\n"))
+     if (!cTcpSocket->SendText((QString)PassWord.toBase64() + "\r\n"))
         {
          cLastError= SENDINGERROR;
          return false;
         }
 
-     QString s= cTcpSocket.ReceiveText();
+     QString s= cTcpSocket->ReceiveText();
      if (s.left(3) != "235")
         {
          printf(qPrintable("Auth3:  " + s));
@@ -201,4 +254,4 @@ bool CSmtpClient::ServerLogIn(QString iHostName, QString iUserName, QString iPas
 
  return false;
 }
-//-----------------------------------------------------------------
+

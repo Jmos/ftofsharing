@@ -1,67 +1,83 @@
-//=================================================================
-// Name:	    	pop3client.cpp
-// Autor: 	  		Saxl Georg
-// Version:	  		1.0
-// Datum: 	  		28.10.2010
-// Beschreibung:
-//=================================================================
-
 
 #include "pop3client.h"
 //-----------------------------------------------------------------
 
-CPop3Client::CPop3Client()
+/**
+*  Constructor of CPop3Client-Class\n
+*  and Parent-Constructor of CMailClient-Class
+*
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL)
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CPop3Client::CPop3Client(CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolPOP3, iConnectionType)
 {
- Initialise();
 }
-//-----------------------------------------------------------------
 
-CPop3Client::CPop3Client(QString iHostName)
+/**
+*  Constructor of CPop3Client-Class\n
+*  and Parent-Constructor of CMailClient-Class
+*
+*  @param   iHostName Defines the Host to connect to.
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL)
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CPop3Client::CPop3Client(QString iHostName, CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolPOP3, iConnectionType, iHostName)
 {
- cHostName= iHostName;
-
- Initialise();
 }
-//-----------------------------------------------------------------
 
-CPop3Client::CPop3Client(QString iHostName, QString iUserName, QString iPassWord)
+/**
+*  Constructor of CPop3Client-Class\n
+*  and Parent-Constructor of CMailClient-Class
+*
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @param   iConnectionType Sets the connection type (unencrypted/SSL)
+*
+*  @see CMailClient
+*
+********************************************************************************/
+CPop3Client::CPop3Client(QString iHostName, QString iUserName, QString iPassWord, CTcpSocket::EConnectionType iConnectionType): CMailClient(ProtocolPOP3, iConnectionType, iHostName, iUserName, iPassWord)
 {
- cHostName= iHostName;
- cUserName= iUserName;
- cPassWord= iPassWord;
-
- Initialise();
 }
-//-----------------------------------------------------------------
 
-void CPop3Client::Initialise()
-{
- cLastError=            NOERROR;
- cMaxServerTimeOut=     5000;
-}
-//-----------------------------------------------------------------
-
-EErrorCode CPop3Client::GetLastErrorCode()
-{
- EErrorCode CurrentErrorCode= cLastError;
- cLastError= NOERROR;
-
- return CurrentErrorCode;
-}
-//-----------------------------------------------------------------
-
+/**
+*  This function checks the current number of mails in your mailbox.
+*
+*  @return  Returns the number of mails in your mailbox, on error -1.
+*
+********************************************************************************/
 int CPop3Client::GetMailCount()
 {
  return GetMailCount(cHostName, cUserName, cPassWord);
 }
-//-----------------------------------------------------------------
 
+/**
+*  This function checks the current number of mails in your mailbox.
+*
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns the number of mails in your mailbox, on error -1.
+*
+********************************************************************************/
 int CPop3Client::GetMailCount(QString iUserName, QString iPassWord)
 {
  return GetMailCount(cHostName, iUserName, iPassWord);
 }
-//-----------------------------------------------------------------
 
+/**
+*  This function checks the current number of mails in your mailbox.
+*
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns the number of mails in your mailbox, on error -1.
+*
+********************************************************************************/
 int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPassWord)
 {
  QString RxBuffer;
@@ -74,19 +90,19 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
  if (!ServerLogIn(iHostName, iUserName, iPassWord))
     return -1;
 
- if (!cTcpSocket.SendText("STAT\n\r"))
+ if (!cTcpSocket->SendText("STAT\n\r"))
     {
      cLastError= SENDINGERROR;
      return -1;
     }
 
- RxBuffer= cTcpSocket.ReceiveText(cMaxServerTimeOut);
+ RxBuffer= cTcpSocket->ReceiveText(cMaxServerTimeOut);
 
- cTcpSocket.Disconnect();
+ cTcpSocket->Disconnect();
 
  if (RxBuffer.isEmpty())
     {
-     if (cTcpSocket.IsConnected())
+     if (cTcpSocket->IsConnected())
         cLastError= NORESPONSEFROMSERVER;
      else
         cLastError= LOSTCONNECTION;
@@ -108,21 +124,50 @@ int CPop3Client::GetMailCount(QString iHostName, QString iUserName, QString iPas
  cLastError= UNKNOWNSERVERERROR;
  return -1;
 }
-//-----------------------------------------------------------------
 
-REMail *CPop3Client::GetMail(int iMailIndex)
+/**
+*  This function receives a mail with help of a mail-index.\n
+*  This mail-index must be smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index 0.
+*
+*  @param   iMailIndex Index of the mail you want to receive.
+*  @return  Returns a pointer to the received mail-record on success, on error NULL.
+*
+********************************************************************************/
+CMailClient::REMail *CPop3Client::GetMail(int iMailIndex)
 {
  return GetMail(iMailIndex, cHostName, cUserName, cPassWord);
 }
-//-----------------------------------------------------------------
 
-REMail *CPop3Client::GetMail(int iMailIndex, QString iUserName, QString iPassWord)
+/**
+*  This function receives a mail with help of a mail-index.\n
+*  This mail-index must be smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index 0.
+*
+*  @param   iMailIndex Index of the mail you want to receive.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns a pointer to the received mail-record on success, on error NULL.
+*
+********************************************************************************/
+CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iUserName, QString iPassWord)
 {
  return GetMail(iMailIndex, cHostName, iUserName, iPassWord);
 }
-//-----------------------------------------------------------------
 
-REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord)
+/**
+*  This function receives a mail with help of a mail-index.\n
+*  This mail-index must be smaller than the current number of mails\n
+*  in your mailbox. First mail you get with mail-index 0.
+*
+*  @param   iMailIndex Index of the mail you want to receive.
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns a pointer to the received mail-record on success, on error NULL.
+*
+********************************************************************************/
+CMailClient::REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserName, QString iPassWord)
 {
  REMail *Mail = new REMail();
  QList<QString> RxBuffer;
@@ -138,7 +183,7 @@ REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserNam
 
  if (iMailIndex <= 0)
     {
-     cLastError= MAILINDEXOUTOUBOUNDS;
+     cLastError= MAILINDEXOUTOFBOUNDS;
      return NULL;
     }
  if (MailCount == -1)
@@ -150,17 +195,17 @@ REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserNam
     }
  if (MailCount < iMailIndex)
     {
-     cLastError= MAILINDEXOUTOUBOUNDS;
+     cLastError= MAILINDEXOUTOFBOUNDS;
      return NULL;
     }
 
- if (!cTcpSocket.SendText("RETR " + QString::number(iMailIndex) + "\n\r"))
+ if (!cTcpSocket->SendText("RETR " + QString::number(iMailIndex) + "\n\r"))
     {
      cLastError= SENDINGERROR;
      return false;
     }
 
- if (!cTcpSocket.ReceiveLines(RxBuffer, cMaxServerTimeOut))
+ if (!cTcpSocket->ReceiveLines(RxBuffer, cMaxServerTimeOut))
     {
      cLastError= UNKNOWNSERVERERROR;
      return false;
@@ -181,83 +226,14 @@ REMail *CPop3Client::GetMail(int iMailIndex, QString iHostName, QString iUserNam
 
  return Mail;
 }
-//-----------------------------------------------------------------
 
-int CPop3Client::GetMaxServerTimeOut()
-{
- return cMaxServerTimeOut;
-}
-//-----------------------------------------------------------------
-
-void CPop3Client::SetMaxServerTimeOut(int iMaxServerTimeOut)
-{
- cMaxServerTimeOut= iMaxServerTimeOut;
-}
-//-----------------------------------------------------------------
-
-bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPassWord)
-{
- if (cTcpSocket.ConnectTo(iHostName, 110, cMaxServerTimeOut))
-    {
-     if (!cTcpSocket.ReceiveText().contains("+OK"))
-        {
-         cLastError= UNKNOWNSERVERERROR;
-         return false;
-        }
-     if (!cTcpSocket.SendText("USER " + iUserName + "\n\r"))
-        {
-         cLastError= SENDINGERROR;
-         return false;
-        }
-     if (!cTcpSocket.ReceiveText().contains("+OK"))
-        {
-         cLastError= UNKNOWNSERVERERROR;
-         return false;
-        }
-     if (!cTcpSocket.SendText("PASS " + iPassWord + "\n\r"))
-        {
-         cLastError= SENDINGERROR;
-         return false;
-        }
-     if (!cTcpSocket.ReceiveText().contains("+OK"))
-        {
-         cLastError= UNKNOWNSERVERERROR;
-         return false;
-        }
-
-      return true;
-    }
-    else
-    {
-     cLastError= UNAVAILABLEHOST;
-    }
-
- return false;
-}
-//-----------------------------------------------------------------
-
-bool CPop3Client::CheckParams(QString iHostName, QString iUserName, QString iPassWord)
-{
- if (iHostName.isEmpty())
- {
-  cLastError= INVALIDHOSTNAME;
-  return false;
- }
-if (iUserName.isEmpty())
- {
-  cLastError= INVALIDUSERNAME;
-  return false;
- }
-if (iPassWord.isEmpty())
- {
-  cLastError= INVALIDPASSWORD;
-  return false;
- }
-
- return true;
-}
-//-----------------------------------------------------------------
-
+/**
+*  Private function to parse the important information out of the mail-header.
+*
+*  @param   iMailHeader Contains the complete mail-header.
+*  @param   oMail Pointer to the mail record.
+*
+********************************************************************************/
 void CPop3Client::ParseMailHeader(QString iMailHeader, REMail *oMail)
 {
  QString TempBuffer= iMailHeader;
@@ -291,14 +267,59 @@ void CPop3Client::ParseMailHeader(QString iMailHeader, REMail *oMail)
 
   TempBuffer= iMailHeader;
  }
-
- /*//Debug
- std::cout << "\n\nTo: " << qPrintable(oMail->To);
- std::cout << "\nFrom: " << qPrintable(oMail->From);
- std::cout << "\nSubject: " << qPrintable(oMail->Subject);
- */
 }
-//-----------------------------------------------------------------
+
+/**
+*  Implementation of abstract class CMailClient.\n
+*  Private function to login at the current host.
+*
+*  @param   iHostName Defines the host to connect to.
+*  @param   iUserName Defines the username for authentication.
+*  @param   iPassWord Defines the password for authentication.
+*  @return  Returns \c true when login was successfully, else \c false.
+*
+*  @see CMailClient, CSmtpClient
+*
+********************************************************************************/
+bool CPop3Client::ServerLogIn(QString iHostName, QString iUserName, QString iPassWord)
+{
+ if (cTcpSocket->ConnectTo(iHostName, cServerPort, cMaxServerTimeOut))
+    {
+     if (!cTcpSocket->ReceiveText().contains("+OK"))
+        {
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
+     if (!cTcpSocket->SendText("USER " + iUserName + "\n\r"))
+        {
+         cLastError= SENDINGERROR;
+         return false;
+        }
+     if (!cTcpSocket->ReceiveText().contains("+OK"))
+        {
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
+     if (!cTcpSocket->SendText("PASS " + iPassWord + "\n\r"))
+        {
+         cLastError= SENDINGERROR;
+         return false;
+        }
+     if (!cTcpSocket->ReceiveText().contains("+OK"))
+        {
+         cLastError= UNKNOWNSERVERERROR;
+         return false;
+        }
+
+      return true;
+    }
+    else
+    {
+     cLastError= UNAVAILABLEHOST;
+    }
+
+ return false;
+}
 
 
 

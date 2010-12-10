@@ -8,35 +8,39 @@
 #include <QString>
 #include <QObject>
 #include <QHostAddress>
-#include <iostream>
-
 //-----------------------------------------------------------------
 
 /**
 *    @ingroup   api
 *
-*    Mit dieser Klassen kann ein TCP-Socket auf einfache Weise verwaltet und verwendet werden.
-*
-*    @brief     Verwaltungsklasse für ein TCP-Socket
+*    @brief     Handling of a TCP-Socket
 *    @author    Saxl Georg
 *    @version   1.0
-*    @date  	\a Begonnnen: 27.10.2010  \n\n
-*       	    \a Abgeschlossen:
+*    @date  	\a started:   27.10.2010  \n
+*       	      \a completed: 29.10.2010
+*
+*    This class can easily handle a TCP-connection.\n
+*
+*   @par Version 1.1 (05.12.2010)
+*     \arg SSL supported
 *
 *******************************************************************************/
-
 class CTcpSocket : public QObject
 {
  Q_OBJECT
 
-  QTcpSocket   cTcpSocket;
-  QSslSocket   cSslSocket;
-  bool         cConnected;
-  QTextStream *cSocketStream;
-
  public:
 
-  CTcpSocket();
+  /**
+  * Dieses enum definiert den Verbindungstypen des Sockets.
+  */
+  enum EConnectionType
+  {
+     NONCRYPTEDMODE,    ///< unverschlüsselte Tcp-Verbindung
+     SSLMODE            ///< SSL-verschlüsselte Tcp-Verbindung
+  };
+
+  CTcpSocket(EConnectionType iConnectionType, QObject *iParent= 0);
 
   bool    ConnectTo(QHostAddress iHostAddress, int iPort, int iTimeoutMS= 10000);
   bool    ConnectTo(QString iHostName, int iPort, int iTimeoutMS= 10000);
@@ -47,9 +51,19 @@ class CTcpSocket : public QObject
   bool    ReceiveLines(QList<QString> &oStringList, int iTimeOutMs = 5000);
   QString ReceiveText(int iTimeOutMs = 5000);
 
+  EConnectionType GetConnectionType();
+
+ private:
+
+  EConnectionType cConnectionType;
+  QTcpSocket      cTcpSocket;
+  QSslSocket      cSslSocket;
+  bool            cConnected;
+
  private slots:
 
   void Connected();
+  void EncryptedMode();
   void Disconnected();
 };
 //-----------------------------------------------------------------
