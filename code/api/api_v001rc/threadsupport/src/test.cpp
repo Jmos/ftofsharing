@@ -10,7 +10,7 @@
  */
 
 // Qt Includes
-
+#include <QString>
 // Std Includes
 
 // Linux Includes
@@ -22,23 +22,27 @@
 
 // Application Includes
 #include "test.h"
+#include "msgQ.h"
 // Defines
-
 /**************************************************************************************/
 
 Test::Test()
     {
+    m_msgQID= MessageQ.AddMessageQ();
     }
 
 Test::~Test()
     {
     }
 
-void Test::run(void*)
+void Test::run1(void*)
     {
-    printf("log");
-    sleep(1);
-    printf("log1");
-    sleep(1);
-    printf("log2");
+     MessageQ.SendMessage(m_msgQID, 6, "Hallo, das ist ein Test!");
+    }
+
+void Test::run2(void*)
+    {
+    QString Message;
+    MessageQ.ReceiveMessage(m_msgQID,6,Message);
+    printf("%s",qPrintable(Message));
     }

@@ -22,6 +22,7 @@
 #include "thread.h"
 #include "test.h"
 #include "stdio.h"
+#include "timer.h"
 // Defines
 
 /**************************************************************************************/
@@ -38,11 +39,13 @@ int main(int argc, char** argv)
     //    getchar();
 
     Test *x = new Test;
-    TempThread<Test,void*>* ploop = new TempThread<Test,void*>("loop", x, &Test::run);
+    TempThread<Test,void*>* ploop1 = new TempThread<Test,void*>("loop", x, &Test::run1);
+    TempThread<Test,void*>* ploop2 = new TempThread<Test,void*>("loop", x, &Test::run2);
 
-    ploop->start();
+    ploop1->start();
+    ploop2->start();
 
-    while(ploop->isRunning())
+    while(ploop1->isRunning() || ploop2->isRunning())
         sleep(1);
 
     return 0;

@@ -4,34 +4,28 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	include/thread.h\
-        include/test.h\
-
+HEADERS +=	include/sysres.h\
 
 ############################# Source Files ##################################
 
-SOURCES +=  src/main.cpp\
-        src/test.cpp\
-        ../msgQ/src/msgQ.cpp\
-        ../msgQ/src/msgList.cpp\
-        
+SOURCES += 	src/main.cpp\
+
 ############################# Resource Files ##################################
 
-TARGET = ./release/thread
-TARGET += ./release/thread
+TARGET = ./release/sysres
+TARGET += ./release/sysres
 
 ############################# Dependencies ##################################
 
 INCLUDEPATH += ./include \
-               ./src    \
-               ../msgQ/include\
-               ../supportlib/timer/include
+               ./src  \
+               ../ 
 
 ############################# Dependencies ##################################
 
 DEPENDPATH += ;$$INCLUDEPATH
 
-############################# XML2header ###############    ###################
+############################# XML2header ##################################
 
 XML2HEADER=xxml2header
 

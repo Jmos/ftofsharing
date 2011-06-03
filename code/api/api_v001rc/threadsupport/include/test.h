@@ -41,8 +41,10 @@ class Test
          * Destructor Docu
                  */
         ~Test();
-        void run(void*);
+        void run1(void*);
+        void run2(void*);
     private:
+        int m_msgQID;
     };
 
 #endif //__TEST_H__
