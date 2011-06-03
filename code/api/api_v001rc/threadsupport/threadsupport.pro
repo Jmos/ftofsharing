@@ -4,12 +4,13 @@ TEMPLATE = app
 
 ############################# Header Files ##################################
 
-HEADERS +=	include/thread.h
+HEADERS +=	include/thread.h\
+		include/test.h
 
 ############################# Source Files ##################################
 
-SOURCES += 	src/thread.cpp \
-            src/main.cpp
+SOURCES +=  src/main.cpp\
+	    src/test.cpp
 
 ############################# Resource Files ##################################
 
