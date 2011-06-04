@@ -20,6 +20,7 @@
 
 // Library Includes
 #include "global_defines.h"
+#include <iostream>
 // Application Includes
 
 // Defines
@@ -31,6 +32,21 @@
  @author muma
  @date 03.06.2011
  */
+
+class ByteArrayWrapper
+    {
+public:
+    ByteArrayWrapper();
+    ~ByteArrayWrapper();
+
+    static QByteArray getValue(int value);
+    static QByteArray getValue(double value);
+    static QByteArray getValue(short value);
+    static QByteArray getValue(QString value);
+    static QString getComplexValue(QByteArray value);
+private:
+    };
+
 class SysRes
     {
 
@@ -58,28 +74,39 @@ public:
 
     template<class T> void registerResource(T value, QString name)
         {
-        SysResData data;
-        data = getData<T> (value);
-
-        m_oMap[name] = data;
-        }
-    bool unregisterResource(QString name)
-        {
-        if (m_oMap.contains(name))
+        if (typeid(T) == typeid(int))
             {
-            m_oMap.remove(name);
-            return true;
+            std::cout << "int"<< "\n";
+            m_oMap[name] = ByteArrayWrapper::getValue(value);
+            std::cout << m_oMap[name].toInt() << "\n";
+            }
+        else if (typeid(T) == typeid(double))
+            {
+            std::cout << "double"<< "\n";
+            m_oMap[name] = ByteArrayWrapper::getValue(value);
+            }
+        else if (typeid(T) == typeid(short))
+            {
+            std::cout << "short"<< "\n";
+            m_oMap[name] = ByteArrayWrapper::getValue(value);
+            }
+        else if (typeid(T) == typeid(QString))
+            {
+            std::cout << "QString"<< "\n"; //NOT WORKING!!
+            m_oMap[name] = ByteArrayWrapper::getValue(value);
+            return;
             }
         else
             {
-            return true;
+            std::cout << "unknown";
             }
         }
-    template<class T> bool getResource(QString name, T &value)
+
+    bool unregisterResource(QString name)
         {
-        if (m_oMap.contains(name))
+        if(m_oMap.contains(name))
             {
-            value = getData<T> (name);
+            m_oMap.remove(name);
             return true;
             }
         else
@@ -87,65 +114,45 @@ public:
             return false;
             }
         }
+
+    template<class T> bool getResource(QString name, T &value)
+        {
+        if (typeid(T) == typeid(int))
+            {
+            std::cout << "int" << "\n";
+            bool ok = true;
+            value = m_oMap[name].toInt(&ok);
+            return ok;
+            }
+        else if (typeid(T) == typeid(double))
+            {
+            std::cout << "double" << "\n";
+            bool ok = true;
+            value = m_oMap[name].toDouble(&ok);
+            return ok;
+            }
+        else if (typeid(T) == typeid(QString))
+            {
+            std::cout << "QString" << "\n"; // NOT SUPPORTED
+//            value = ByteArrayWrapper::getComplexValue(m_oMap[name]);
+            return false;
+            }
+        else if (typeid(T) == typeid(short))
+            {
+            std::cout << "short" << "\n";
+            bool ok = true;
+            value = m_oMap[name].toShort(&ok);
+            return ok;
+            }
+        else
+            {
+            std::cout << "unknown" << "\n";
+            return false;
+            }
+        }
 private:
-    template<class T> SysResData getData(T value)
-        {
-        SysResData returnValue;
-        if (typeid(value) == typeid(int))
-            {
-            returnValue.type = eSysResInt;
-            returnValue.data = QByteArray((const char*) &value, sizeof value);
-            }
-        else if (typeid(value) == typeid(double))
-            {
-            returnValue.type = eSysResDouble;
-            returnValue.data = QByteArray((const char*) &value, sizeof value);
-            }
-        else if (typeid(value) == typeid(QString))
-            {
-            returnValue.type = eSysResString;
-            returnValue.data = QByteArray(value);
-            }
-        else if (typeid(value) == typeid(short))
-            {
-            returnValue.type = eSysResShort;
-            returnValue.data = QByteArray((const char*) &value, sizeof value);
-            }
-        else
-            {
-            returnValue.type = eSysResUndef;
-            returnValue.data = QByteArray();
-            }
-        }
-
-
-    template<class T> T getData(QString name)
-        {
-        if (m_oMap[name].type == eSysResInt)
-            {
-            return m_oMap[name].data.toInt();
-            }
-        else if (m_oMap[name].type == eSysResDouble)
-            {
-            return m_oMap[name].data.toDouble();
-            }
-        else if (m_oMap[name].type == eSysResString)
-            {
-//            return QString(m_oMap[name].data());
-            }
-        else if (m_oMap[name].type == eSysResShort)
-            {
-            return m_oMap[name].data.toShort();
-            }
-        else
-            {
-            return T();
-            }
-        }
     static SysRes* m_pInstance;
-    QMap<QString, SysResData> m_oMap;
-};
-
-SysRes *SysRes::m_pInstance = NULL;
+    QMap<QString,QByteArray> m_oMap;
+    };
 
 #endif //__SYSRES_H__

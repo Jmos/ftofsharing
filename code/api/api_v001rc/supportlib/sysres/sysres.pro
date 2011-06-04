@@ -8,7 +8,8 @@ HEADERS +=	include/sysres.h\
 
 ############################# Source Files ##################################
 
-SOURCES += 	src/main.cpp\
+SOURCES += 	src/sysres.cpp\
+            src/main.cpp\
 
 ############################# Resource Files ##################################
 
